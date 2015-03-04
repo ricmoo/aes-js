@@ -1,0 +1,20 @@
+{
+  "name": "aes-js",
+  "version": "0.0.1",
+  "description": "A pure JavaScript implementation of the AES block cipher and all common modes of operation.",
+  "devDependencies": {
+    "nodeunit": "0.9.1"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/test-aes.js"
+  },
+  "keywords": [
+    "aes",
+    "aes-ctr", "aes-ofb", "aes-ecb", "aes-cbc", "aes-cfb",
+    "encrypt", "decrypt",
+    "block", "cipher"
+  ],
+  "author": "Richard Moore <me@ricmoo.com>",
+  "license": "MIT"
+}
