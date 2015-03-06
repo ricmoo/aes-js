@@ -59,23 +59,9 @@ function makeTest(options) {
         for (var i = 0; i < plaintext.length; i++) {
             var ciphertext2 = encrypter.encrypt(plaintext[i]);
             test.ok(bufferEquals(ciphertext2, ciphertext[i]), "encrypt failed to match test vector");
-            if (!bufferEquals(ciphertext2, ciphertext[i])) {
-                console.log(options);
-                console.log({seg: segmentSize});
-                console.log({a: ciphertext[i].toString('hex')});
-                console.log({b: ciphertext2.toString('hex')});
-                break;
-            }
 
             var plaintext2 = decrypter.decrypt(ciphertext2);
             test.ok(bufferEquals(plaintext2, plaintext[i]), "decrypt failed to match original text");
-            if (!bufferEquals(plaintext2, plaintext[i])) {
-                //console.log(options);
-                console.log({seg: segmentSize});
-                console.log({a: plaintext[i].toString('hex')});
-                console.log({b: plaintext2.toString('hex')});
-                break;
-            }
         }
 
         test.done();
