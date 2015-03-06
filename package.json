@@ -1,10 +1,10 @@
 {
   "name": "aes-js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "bugs": {
-    "url" : "http://github.com/ricmoo/aes-js/issues", 
-    "email" : "aes-js@ricmoo.com"
-  }, 
+    "url": "http://github.com/ricmoo/aes-js/issues",
+    "email": "aes-js@ricmoo.com"
+  },
   "description": "A pure JavaScript implementation of the AES block cipher and all common modes of operation.",
   "devDependencies": {
     "nodeunit": "0.9.1"
@@ -19,9 +19,15 @@
   },
   "keywords": [
     "aes",
-    "aes-ctr", "aes-ofb", "aes-ecb", "aes-cbc", "aes-cfb",
-    "encrypt", "decrypt",
-    "block", "cipher"
+    "aes-ctr",
+    "aes-ofb",
+    "aes-ecb",
+    "aes-cbc",
+    "aes-cfb",
+    "encrypt",
+    "decrypt",
+    "block",
+    "cipher"
   ],
   "author": "Richard Moore <me@ricmoo.com>",
   "license": "MIT"
