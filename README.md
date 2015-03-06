@@ -74,8 +74,10 @@ There are several modes of operations, each with various pros and cons. In gener
 ### CTR - Counter (recommended)
 
 ```javascript
+var key = aesjs.util.convertStringToBytes("Example128BitKey");
+
 // Convert text to bytes
-var text = 'Text may be any length you wish, no padding is required.'
+var text = 'Text may be any length you wish, no padding is required.';
 var textBytes = aesjs.util.convertStringToBytes(text);
 
 // The counter is optional, and if omitted will begin at 0
@@ -97,28 +99,108 @@ console.log(decryptedText);
 ### CBC - Cipher-Block Chaining (recommended)
 
 ```javascript
-// coming soon...
+var key = aesjs.util.convertStringToBytes("Example128BitKey");
+
+// The initialization vector, which must be 16 bytes
+var iv = aesjs.util.convertStringToBytes("IVMustBe16Bytes.");
+
+// Convert text to bytes
+var text = 'TextMustBe16Byte';
+var textBytes = aesjs.util.convertStringToBytes(text);
+
+var aesCbc = new aesjs.ModeOfOperation.cbc(key, iv);
+var encryptedBytes = aesCbc.encrypt(textBytes);
+
+// The cipher-block chaining mode of operation maintains internal
+// state, so to decrypt a new instance must be instantiated.
+var aesCbc = new aesjs.ModeOfOperation.cbc(key, iv);
+var decryptedBytes = aesCbc.decrypt(encryptedBytes);
+
+// Convert our bytes back into text
+var decryptedText = aesjs.util.convertBytesToString(decryptedBytes);
+console.log(decryptedText);
+// "TextMustBe16Byte"
 ```
 
 
 ### CFB - Cipher Feedback 
 
 ```javascript
-// coming soon...
+var key = aesjs.util.convertStringToBytes("Example128BitKey");
+
+// The initialization vector, which must be 16 bytes
+var iv = aesjs.util.convertStringToBytes("IVMustBe16Bytes.");
+
+// Convert text to bytes
+var text = 'TextMustBeAMultipleOfSegmentSize';
+var textBytes = aesjs.util.convertStringToBytes(text);
+
+// The segment size is optional, and defaults to 1
+var aesCfb = new aesjs.ModeOfOperation.cfb(key, iv, 8);
+var encryptedBytes = aesCfb.encrypt(textBytes);
+
+// The cipher feedback mode of operation maintains internal state,
+// so to decrypt a new instance must be instantiated.
+var aesCfb = new aesjs.ModeOfOperation.cfb(key, iv, 8);
+var decryptedBytes = aesCfb.decrypt(encryptedBytes);
+
+// Convert our bytes back into text
+var decryptedText = aesjs.util.convertBytesToString(decryptedBytes);
+console.log(decryptedText);
+// "TextMustBeAMultipleOfSegmentSize"
 ```
 
 
 ### OFB - Output Feedback
 
 ```javascript
-// coming soon...
+var key = aesjs.util.convertStringToBytes("Example128BitKey");
+
+// The initialization vector, which must be 16 bytes
+var iv = aesjs.util.convertStringToBytes("IVMustBe16Bytes.");
+
+// Convert text to bytes
+var text = 'Text may be any length you wish, no padding is required.';
+var textBytes = aesjs.util.convertStringToBytes(text);
+
+var aesOfb = new aesjs.ModeOfOperation.ofb(key, iv);
+var encryptedBytes = aesOfb.encrypt(textBytes);
+
+// The output feedback mode of operation maintains internal state,
+// so to decrypt a new instance must be instantiated.
+var aesOfb = new aesjs.ModeOfOperation.ofb(key, iv);
+var decryptedBytes = aesOfb.decrypt(encryptedBytes);
+
+// Convert our bytes back into text
+var decryptedText = aesjs.util.convertBytesToString(decryptedBytes);
+console.log(decryptedText);
+// "Text may be any length you wish, no padding is required."
 ```
 
 
 ### ECB - Electronic Codebook (NOT recommended)
 
+This mode is **not** recommended. Since, for a given key, the same plaintext block in produces the same ciphertext block out, this mode of operation can leak data, such as patterns. For more details and examples, see the Wikipedia article, [Electronic Codebook](http://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_Codebook_.28ECB.29).
+
 ```javascript
-// coming soon...
+var key = aesjs.util.convertStringToBytes("Example128BitKey");
+
+// Convert text to bytes
+var text = 'TextMustBe16Byte';
+var textBytes = aesjs.util.convertStringToBytes(text);
+
+var aesEcb = new aesjs.ModeOfOperation.ecb(key);
+var encryptedBytes = aesEcb.encrypt(textBytes);
+
+// Since electronic codebook does not store state, we can
+// reuse the same instance.
+//var aesEcb = new aesjs.ModeOfOperation.ecb(key);
+var decryptedBytes = aesEcb.decrypt(encryptedBytes);
+
+// Convert our bytes back into text
+var decryptedText = aesjs.util.convertBytesToString(decryptedBytes);
+console.log(decryptedText);
+// "TextMustBe16Byte"
 ```
 
 
