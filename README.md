@@ -195,6 +195,8 @@ Todo...
 Tests
 -----
 
+A test suite has been generated (`test/test-vectors.json`) from a known correct implementation, [pycrypto](https://www.dlitz.net/software/pycrypto/). To generate new test vectors, run `python generate-tests.py`.
+
 To run the node.js test suite:
 
 ```
