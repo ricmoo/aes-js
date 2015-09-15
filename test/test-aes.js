@@ -48,7 +48,7 @@ function makeTest(options) {
                 func = function() { return new mo(key, iv); }
                 break;
             case 'ctr':
-                func = function() { return new mo(key, new aes.Counter()); }
+                func = function() { return new mo(key, new aes.Counter(0)); }
                 break;
             default:
                 throw new Error('unknwon mode of operation')

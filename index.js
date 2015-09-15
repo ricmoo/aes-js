@@ -521,20 +521,35 @@
      *  Counter object for CTR common mode of operation
      */
     var Counter = function(initialValue) {
-        if (initialValue === null) { initialValue = 1; }
+        if (initialValue === null || initialValue === undefined) { initialValue = 1; }
 
-        this._counter = createBuffer([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        if (typeof(initialValue) === 'number') {
+            this._counter = createBuffer([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+            this.setValue(initialValue);
 
-        this.setValue(initialValue);
+        } else {
+            this.setBytes(initialValue);
+        }
     }
 
     Counter.prototype.setValue = function(value) {
+        if (typeof(initialValue) === 'number') {
+            throw new Error('value must be a number');
+        }
+
         var index = 0, shift = 120;
         while (shift >= 0) {
             this._counter[index++] = (value >> shift) % 256;
             shift -= 8;
         }
     }
+
+    Counter.prototype.setBytes = function(bytes) {
+        if (bytes.length != 16) {
+            throw new Error('invalid counter bytes size (must be 16)');
+        }
+        this._counter = createBuffer(bytes);
+    };
 
     Counter.prototype.increment = function() {
         for (var i = 15; i >= 0; i--) {

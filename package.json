@@ -1,6 +1,6 @@
 {
   "name": "aes-js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "bugs": {
     "url": "http://github.com/ricmoo/aes-js/issues",
     "email": "aes-js@ricmoo.com"
@@ -11,7 +11,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "node test/test-aes.js"
+    "test": "node test/test-aes.js && node test/test-counter.js"
   },
   "repository": {
     "type": "git",
