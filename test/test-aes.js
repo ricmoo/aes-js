@@ -1,6 +1,6 @@
 var nodeunit = require('nodeunit');
 
-var aes = require('../index')
+var aes = require('../index');
 
 function bufferEquals(a, b) {
     if (a.length != b.length) { return false; }
