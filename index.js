@@ -25,7 +25,7 @@
                         throw new Error('invalid byte at index ' + i + '(' + arg[i] + ')');
                     }
                 }
-                return arg.slice(0);
+                return ArrayBuffer.isView(arg) ? arg.subarray(0) : arg.slice(0);
             }
         }
 
