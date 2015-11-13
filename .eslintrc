@@ -1,0 +1,15 @@
+---
+env:
+  node: true
+  browser: true
+rules:
+  quotes: [0, double]
+  curly: 0
+  no-underscore-dangle: 0
+  camelcase: 0
+  semi: 1
+  no-use-before-define: 1
+  eqeqeq: 1
+  no-alert: 0
+  no-unused-vars: 1
+

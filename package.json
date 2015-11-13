@@ -7,10 +7,12 @@
   },
   "description": "A pure JavaScript implementation of the AES block cipher and all common modes of operation.",
   "devDependencies": {
+    "eslint": "^1.9.0",
     "nodeunit": "0.9.1"
   },
   "main": "index.js",
   "scripts": {
+    "lint": "eslint index.js src test",
     "test": "node test/test-aes.js && node test/test-counter.js"
   },
   "repository": {
