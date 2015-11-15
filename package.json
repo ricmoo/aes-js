@@ -11,7 +11,7 @@
     "jasmine": "^2.3.2",
     "jasmine-core": "^2.3.4"
   },
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "lint": "eslint index.js src test",
     "generate-tests": "python generate-tests.py > spec/fixtures/test-vectors.js",
