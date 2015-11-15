@@ -1,5 +1,25 @@
 var aes = require('../src/index');
 
+function createBuffer(data, hex) {
+  if (typeof Buffer === 'undefined') {
+    var i, buffer = [];
+    if (data) {
+      if (hex) {
+	for (i = 0; i < data.length; i += 2) {
+	  buffer.push(parseInt(data.substring(i, i + 2), 16));
+	}
+      } else {
+	for (i = 0; i < data.length; ++i) {
+	  buffer.push(data[i]);
+	}
+      }
+    }
+    return buffer;
+  } else {
+    return new Buffer(data, hex);
+  }
+}
+
 function bufferEquals(a, b) {
   if (a.length != b.length) { return false; }
   for (var i = 0; i < a.length; i++) {
@@ -11,7 +31,7 @@ function bufferEquals(a, b) {
 describe('Counter', function() {
   describe('test-counter-number', function() {
     function makeTestNumber(options) {
-      var result = new Buffer(options.incrementResult, 'hex');
+      var result = createBuffer(options.incrementResult, 'hex');
 
       var counter = new aes.Counter(options.number);
       counter.increment();
@@ -36,9 +56,9 @@ describe('Counter', function() {
 
   describe('test-counter-bytes', function() {
     function makeTestBytes(options) {
-      var result = new Buffer(options.incrementResult, 'hex');
+      var result = createBuffer(options.incrementResult, 'hex');
 
-      var bytes = new Buffer(options.bytes, 'hex');
+      var bytes = createBuffer(options.bytes, 'hex');
 
       var counter = new aes.Counter(bytes);
       counter.increment();

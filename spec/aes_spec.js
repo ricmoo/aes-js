@@ -1,5 +1,25 @@
 var aes = require('../src/index');
 
+function createBuffer(data, hex) {
+  if (typeof Buffer === 'undefined') {
+    var i, buffer = [];
+    if (data) {
+      if (hex) {
+	for (i = 0; i < data.length; i += 2) {
+	  buffer.push(parseInt(data.substring(i, i + 2), 16));
+	}
+      } else {
+	for (i = 0; i < data.length; ++i) {
+	  buffer.push(data[i]);
+	}
+      }
+    }
+    return buffer;
+  } else {
+    return new Buffer(data, hex);
+  }
+}
+
 function bufferEquals(a, b) {
     if (a.length != b.length) { return false; }
     for (var i = 0; i < a.length; i++) {
@@ -15,20 +35,20 @@ function makeTest(options) {
 
     var plaintext = [];
     for (var i = 0; i < options.plaintext.length; i++) {
-        plaintext.push(new Buffer(options.plaintext[i]));
+        plaintext.push(createBuffer(options.plaintext[i]));
     }
 
-    var key = new Buffer(options.key);
+    var key = createBuffer(options.key);
 
     var iv = null;
-    if (options.iv) { iv = new Buffer(options.iv); }
+    if (options.iv) { iv = createBuffer(options.iv); }
 
     var segmentSize = 0;
     if (options.segmentSize) { segmentSize = options.segmentSize; }
 
     var ciphertext = [];
     for (var i = 0; i < options.encrypted.length; i++) {
-        ciphertext.push(new Buffer(options.encrypted[i]));
+        ciphertext.push(createBuffer(options.encrypted[i]));
     }
 
 
@@ -65,7 +85,7 @@ function makeTest(options) {
 };
 
 
-var testVectors = require('./fixtures/test-vectors.json');
+var testVectors = require('./fixtures/test-vectors.js');
 
 describe('Examples', function() {
   for (var i = 0; i < testVectors.length; i++) {
