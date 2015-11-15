@@ -1,9 +1,6 @@
 "use strict";
 
 
-(function() {
-    var root = this;
-
     var createBuffer = null, convertBytesToString, convertStringToBytes = null;
 
     if (typeof Buffer === 'undefined') {
@@ -609,35 +606,13 @@
     };
 
 
-    ///////////////////////
-    // Exports
+module.exports = {
+  AES: AES,
+  Counter: Counter,
+  ModeOfOperation: ModeOfOperation,
+  util: {
+    convertBytesToString: convertBytesToString,
+    convertStringToBytes: convertStringToBytes
+  }
+};
 
-
-    // The block cipher
-    var aesjs = {
-        AES: AES,
-        Counter: Counter,
-        ModeOfOperation: ModeOfOperation,
-        util: {
-            convertBytesToString: convertBytesToString,
-            convertStringToBytes: convertStringToBytes
-        }
-    };
-
-
-
-    if(typeof exports !== 'undefined') {
-        exports.AES = AES;
-        exports.Counter = Counter;
-        exports.ModeOfOperation = ModeOfOperation;
-        exports.util = {
-            convertBytesToString: convertBytesToString,
-            convertStringToBytes: convertStringToBytes
-        }
-
-    } else {
-        root.aesjs = aesjs;
-    }
-
-
-}).call(this);
