@@ -114,5 +114,5 @@ for mode in [ 'CBC', 'CTR',  'CFB', 'ECB', 'OFB' ]:
 
             dt1 = [kaes2.decrypt(k) for k in kenc]
 
-print json.dumps(Tests, indent = 4, sort_keys = True, default = default).replace('"__', '').replace('__"', '')
+print 'module.exports = \n%s;' % json.dumps(Tests, indent = 4, sort_keys = True, default = default).replace('"__', '').replace('__"', '')
 

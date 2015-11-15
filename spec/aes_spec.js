@@ -1,5 +1,3 @@
-var nodeunit = require('nodeunit');
-
 var aes = require('../index');
 
 function bufferEquals(a, b) {
@@ -58,26 +56,24 @@ function makeTest(options) {
         var totalDiffers = 0;
         for (var i = 0; i < plaintext.length; i++) {
             var ciphertext2 = encrypter.encrypt(plaintext[i]);
-            test.ok(bufferEquals(ciphertext2, ciphertext[i]), "encrypt failed to match test vector");
+	    expect(bufferEquals(ciphertext2, ciphertext[i])).toBeTruthy();
 
             var plaintext2 = decrypter.decrypt(ciphertext2);
-            test.ok(bufferEquals(plaintext2, plaintext[i]), "decrypt failed to match original text");
+            expect(bufferEquals(plaintext2, plaintext[i])).toBeTruthy();
         }
-
-        test.done();
     };
 };
 
 
-var testVectors = require('./test-vectors.json');
+var testVectors = require('./fixtures/test-vectors.json');
 
-var Tests = {};
-
-for (var i = 0; i < testVectors.length; i++) {
+describe('Examples', function() {
+  for (var i = 0; i < testVectors.length; i++) {
     var test = testVectors[i];
-    name = 'test-' + test.modeOfOperation + '-' + test.key.length;
-    if (!Tests[name]) { Tests[name] = {}; }
-    Tests[name]['test-' + Object.keys(Tests[name]).length] = makeTest(test);
-}
+    var name = 'test-' + test.modeOfOperation + '-' + test.key.length;
+    it(name, function() {
+      makeTest(test)();
+    });
+  }
+});
 
-nodeunit.reporters.default.run(Tests);

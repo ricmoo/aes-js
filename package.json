@@ -8,12 +8,14 @@
   "description": "A pure JavaScript implementation of the AES block cipher and all common modes of operation.",
   "devDependencies": {
     "eslint": "^1.9.0",
-    "nodeunit": "0.9.1"
+    "jasmine": "^2.3.2",
+    "jasmine-core": "^2.3.4"
   },
   "main": "index.js",
   "scripts": {
     "lint": "eslint index.js src test",
-    "test": "node test/test-aes.js && node test/test-counter.js"
+    "generate-tests": "python generate-tests.py > spec/fixtures/test-vectors.js",
+    "test": "jasmine"
   },
   "repository": {
     "type": "git",
