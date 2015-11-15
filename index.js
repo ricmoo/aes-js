@@ -3,7 +3,6 @@
 
 (function() {
     var root = this;
-    var previous_mymodule = root.mymodule;
 
     var createBuffer = null, convertBytesToString, convertStringToBytes = null;
 
@@ -635,12 +634,6 @@
             convertBytesToString: convertBytesToString,
             convertStringToBytes: convertStringToBytes
         }
-        /*
-        if(typeof module !== 'undefined' && module.exports) {
-            exports = module.exports = export;
-        }
-        exports.mymodule = mymodule;
-        */
 
     } else {
         root.aesjs = aesjs;
