@@ -53,7 +53,7 @@
                       func = function() { return new mo(options.key, options.iv); }
                       break;
                   case 'ctr':
-                      func = function() { return new mo(options.key, new aesjs.Counter()); }
+                      func = function() { return new mo(options.key, new aesjs.Counter(0)); }
                       break;
                   default:
                       throw new Error('unknwon mode of operation')
