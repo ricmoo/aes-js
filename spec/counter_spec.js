@@ -1,50 +1,35 @@
 var aes = require('../src/index');
+var bufferModule = require('../src/buffer');
+var makeBlock = bufferModule.makeBlock;
+var blocks = require('./helpers').blocks;
 
-function createBuffer(data, hex) {
-  if (typeof Buffer === 'undefined') {
-    var i, buffer = [];
-    if (data) {
-      if (hex) {
-	for (i = 0; i < data.length; i += 2) {
-	  buffer.push(parseInt(data.substring(i, i + 2), 16));
-	}
-      } else {
-	for (i = 0; i < data.length; ++i) {
-	  buffer.push(data[i]);
-	}
-      }
-    }
-    return buffer;
-  } else {
-    return new Buffer(data, hex);
+function hexToBlock(data) {
+  var block = makeBlock(data.length / 2);
+  for (var i = 0; i < data.length; i += 2) {
+    block.setUint8(i / 2, parseInt(data.substring(i, i + 2), 16));
   }
-}
-
-function bufferEquals(a, b) {
-  if (a.length != b.length) { return false; }
-  for (var i = 0; i < a.length; i++) {
-    if (a[i] != b[i]) { return false; }
-  }
-  return true;
+  return block;
 }
 
 describe('Counter', function() {
+  blocks();
+
   describe('test-counter-number', function() {
     function makeTestNumber(options) {
-      var result = createBuffer(options.incrementResult, 'hex');
+      var result = hexToBlock(options.incrementResult);
 
       var counter = new aes.Counter(options.number);
       counter.increment();
-      expect(bufferEquals(counter._counter, result)).toBeTruthy();
+      expect(counter._counter).toEqual(result);
 
       counter.setValue(options.number);
       counter.increment();
-      expect(bufferEquals(counter._counter, result)).toBeTruthy();
+      expect(counter._counter).toEqual(result);
 
       counter = new aes.Counter();
       counter.setValue(options.number);
       counter.increment();
-      expect(bufferEquals(counter._counter, result)).toBeTruthy();
+      expect(counter._counter).toEqual(result);
     }
 
     it('test-0', function() { makeTestNumber({number: 0, incrementResult: "00000000000000000000000000000001"}); });
@@ -56,22 +41,22 @@ describe('Counter', function() {
 
   describe('test-counter-bytes', function() {
     function makeTestBytes(options) {
-      var result = createBuffer(options.incrementResult, 'hex');
+      var result = hexToBlock(options.incrementResult);
 
-      var bytes = createBuffer(options.bytes, 'hex');
+      var bytes = hexToBlock(options.bytes);
 
       var counter = new aes.Counter(bytes);
       counter.increment();
-      expect(bufferEquals(counter._counter, result)).toBeTruthy();
+      expect(counter._counter).toEqual(result);
 
       counter.setBytes(bytes);
       counter.increment();
-      expect(bufferEquals(counter._counter, result)).toBeTruthy();
+      expect(counter._counter).toEqual(result);
 
       counter = new aes.Counter();
       counter.setBytes(bytes);
       counter.increment();
-      expect(bufferEquals(counter._counter, result)).toBeTruthy();
+      expect(counter._counter).toEqual(result);
     }
 
     it('test-0000', function() { makeTestBytes({bytes: "00000000000000000000000000000000", incrementResult: "00000000000000000000000000000001"}); });

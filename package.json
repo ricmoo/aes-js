@@ -40,5 +40,8 @@
     "cipher"
   ],
   "author": "Richard Moore <me@ricmoo.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "buffer-dataview": "0.0.2"
+  }
 }

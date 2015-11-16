@@ -1,14 +1,14 @@
 "use strict";
 
 var bufferModule = require('./buffer');
-var createBuffer = bufferModule.createBuffer;
-var convertBytesToString = bufferModule.convertBytesToString;
-var convertStringToBytes = bufferModule.convertStringToBytes;
- 
+var makeBlock = bufferModule.makeBlock;
+var copyBlock = bufferModule.copyBlock;
+var memMove = bufferModule.memMove;
+
 
 
     // Number of rounds by keysize
-    var numberOfRounds = {16: 10, 24: 12, 32: 14}
+    var numberOfRounds = {16: 10, 24: 12, 32: 14};
 
     // Round constant words
     var rcon = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91];
@@ -38,29 +38,22 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
 
     function convertToInt32(bytes) {
         var result = [];
-        for (var i = 0; i < bytes.length; i += 4) {
-            result.push(
-                (bytes[i    ] << 24) |
-                (bytes[i + 1] << 16) |
-                (bytes[i + 2] <<  8) |
-                 bytes[i + 3]
-            );
+        for (var i = 0; i < bytes.byteLength; i += 4) {
+            result.push(bytes.getUint32(i, false));
         }
         return result;
     }
 
 
-
-
     var AES = function(key) {
-        this.key = createBuffer(key);
+        this.key = key;
         this._prepare();
     }
 
 
     AES.prototype._prepare = function() {
 
-        var rounds = numberOfRounds[this.key.length];
+        var rounds = numberOfRounds[this.key.byteLength];
         if (rounds === null) {
             throw new Error('invalid key size (must be length 16, 24 or 32)');
         }
@@ -77,7 +70,7 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
         }
 
         var roundKeyCount = (rounds + 1) * 4;
-        var KC = this.key.length / 4;
+        var KC = this.key.byteLength / 4;
 
         // convert the key into ints
         var tk = convertToInt32(this.key);
@@ -103,7 +96,7 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
             rconpointer += 1;
 
             // key expansion (for non-256 bit)
-            if (KC != 8) {
+            if (KC !== 8) {
                 for (var i = 1; i < KC; i++) {
                     tk[i] ^= tk[i - 1];
                 }
@@ -149,17 +142,17 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
     }
 
     AES.prototype.encrypt = function(plaintext) {
-        if (plaintext.length != 16) {
-            return new Error('plaintext must be a block of size 16');
+        if (plaintext.byteLength !== 16) {
+            throw new Error('plaintext must be a block of size 16');
         }
 
         var rounds = this._Ke.length - 1;
         var a = [0, 0, 0, 0];
 
         // convert plaintext to (ints ^ key)
-        var t = convertToInt32(plaintext);
+        var t = [];
         for (var i = 0; i < 4; i++) {
-            t[i] ^= this._Ke[0][i];
+            t.push(plaintext.getUint32(i * 4, false) ^ this._Ke[0][i]);
         }
 
         // apply round transforms
@@ -175,36 +168,36 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
         }
 
         // the last round is special
-        var result = createBuffer(16), tt;
+        var result = makeBlock(), tt;
         for (var i = 0; i < 4; i++) {
             tt = this._Ke[rounds][i];
-            result[4 * i    ] = (S[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
-            result[4 * i + 1] = (S[(t[(i + 1) % 4] >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
-            result[4 * i + 2] = (S[(t[(i + 2) % 4] >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
-            result[4 * i + 3] = (S[ t[(i + 3) % 4]        & 0xff] ^  tt       ) & 0xff;
+            result.setUint8(4 * i    , (S[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff);
+            result.setUint8(4 * i + 1, (S[(t[(i + 1) % 4] >> 16) & 0xff] ^ (tt >> 16)) & 0xff);
+            result.setUint8(4 * i + 2, (S[(t[(i + 2) % 4] >>  8) & 0xff] ^ (tt >>  8)) & 0xff);
+            result.setUint8(4 * i + 3, (S[ t[(i + 3) % 4]        & 0xff] ^  tt       ) & 0xff);
         }
 
         return result;
     }
 
     AES.prototype.decrypt = function(ciphertext) {
-        if (ciphertext.length != 16) {
-            return new Error('ciphertext must be a block of size 16');
+        if (ciphertext.byteLength !== 16) {
+            throw new Error('ciphertext must be a block of size 16');
         }
 
         var rounds = this._Kd.length - 1;
         var a = [0, 0, 0, 0];
 
         // convert plaintext to (ints ^ key)
-        var t = convertToInt32(ciphertext);
+        var t = [];
         for (var i = 0; i < 4; i++) {
-            t[i] ^= this._Kd[0][i];
+            t.push(ciphertext.getUint32(i * 4, false) ^ this._Kd[0][i]);
         }
 
         // apply round transforms
         for (var r = 1; r < rounds; r++) {
             for (var i = 0; i < 4; i++) {
-                a[i] = (T5[(t[ i          ] >> 24) & 0xff] ^
+                a[i] = (T5[(t[ i         ] >> 24) & 0xff] ^
                         T6[(t[(i + 3) % 4] >> 16) & 0xff] ^
                         T7[(t[(i + 2) % 4] >>  8) & 0xff] ^
                         T8[ t[(i + 1) % 4]        & 0xff] ^
@@ -214,13 +207,13 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
         }
 
         // the last round is special
-        var result = createBuffer(16), tt;
+        var result = makeBlock(), tt;
         for (var i = 0; i < 4; i++) {
             tt = this._Kd[rounds][i];
-            result[4 * i    ] = (Si[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
-            result[4 * i + 1] = (Si[(t[(i + 3) % 4] >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
-            result[4 * i + 2] = (Si[(t[(i + 2) % 4] >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
-            result[4 * i + 3] = (Si[ t[(i + 1) % 4]        & 0xff] ^  tt       ) & 0xff;
+            result.setUint8(4 * i    , (Si[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff);
+            result.setUint8(4 * i + 1, (Si[(t[(i + 3) % 4] >> 16) & 0xff] ^ (tt >> 16)) & 0xff);
+            result.setUint8(4 * i + 2, (Si[(t[(i + 2) % 4] >>  8) & 0xff] ^ (tt >>  8)) & 0xff);
+            result.setUint8(4 * i + 3, (Si[ t[(i + 1) % 4]        & 0xff] ^  tt       ) & 0xff);
         }
 
         return result;
@@ -241,7 +234,7 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
         return this._aes.encrypt(plaintext);
     }
 
-    ModeOfOperationECB.prototype.decrypt = function(ciphertext, encoding) {
+    ModeOfOperationECB.prototype.decrypt = function(ciphertext) {
         return this._aes.decrypt(ciphertext);
     }
 
@@ -250,28 +243,24 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
      *  Mode Of Operation - Cipher Block Chaining (CBC)
      */
     var ModeOfOperationCBC = function(key, iv) {
+        if (iv && iv.byteLength !== 16)
+            throw new Error('initialation vector iv must be of length 16');
+
         this.description = "Cipher Block Chaining";
         this.name = "cbc";
-
-        if (iv === null) {
-            iv = createBuffer([0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-        } else if (iv.length != 16) {
-            return new Error('initialation vector iv must be of length 16');
-        }
-
-        this._lastCipherblock = createBuffer(iv);
+        this._lastCipherblock = iv ? copyBlock(iv) : makeBlock();
 
         this._aes = new AES(key);
     }
 
     ModeOfOperationCBC.prototype.encrypt = function(plaintext) {
-        if (plaintext.length != 16) {
-            return new Error('plaintext must be a block of size 16');
+        if (plaintext.byteLength !== 16) {
+            throw new Error('plaintext must be a block of size 16');
         }
 
-        var precipherblock = createBuffer(plaintext);
+        var precipherblock = copyBlock(plaintext);
         for (var i = 0; i < 16; i++) {
-            precipherblock[i] ^= this._lastCipherblock[i];
+            precipherblock.setUint8(i, precipherblock.getUint8(i) ^ this._lastCipherblock.getUint8(i));
         }
 
         this._lastCipherblock = this._aes.encrypt(precipherblock);
@@ -280,17 +269,17 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
     }
 
     ModeOfOperationCBC.prototype.decrypt = function(ciphertext) {
-        if (ciphertext.length != 16) {
-            return new Error('ciphertext must be a block of size 16');
+        if (ciphertext.byteLength !== 16) {
+            throw new Error('ciphertext must be a block of size 16');
         }
 
         var plaintext = this._aes.decrypt(ciphertext);
         for (var i = 0; i < 16; i++) {
-            plaintext[i] ^= this._lastCipherblock[i];
+            plaintext.setUint8(i, plaintext.getUint8(i) ^ this._lastCipherblock.getUint8(i));
         }
 
-        ciphertext.copy(this._lastCipherblock);
-
+        this._lastCipherblock = copyBlock(ciphertext);
+      
         return plaintext;
     }
 
@@ -299,64 +288,59 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
      *  Mode Of Operation - Cipher Feedback (CFB)
      */
     var ModeOfOperationCFB = function(key, iv, segmentSize) {
+        if (iv && iv.byteLength !== 16)
+            throw new Error('initialation vector iv must be of length 16');
+
         this.description = "Cipher Feedback";
         this.name = "cfb";
-
-        if (iv === null) {
-            iv = createBuffer([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-        } else if (iv.length != 16) {
-            return new Error('initialation vector iv must be of length 16');
-        }
-
-        if (!segmentSize) { segmentSize = 1; }
-
-        this.segmentSize = segmentSize;
-
-        this._shiftRegister = createBuffer(iv);
-
+        this.segmentSize = segmentSize || 1;
+        this._shiftRegister = iv ? copyBlock(iv) : makeBlock();
         this._aes = new AES(key);
     }
 
     ModeOfOperationCFB.prototype.encrypt = function(plaintext) {
-        if ((plaintext.length % this.segmentSize) != 0) {
-            return new Error('plaintext must be a block of size module segmentSize (' + this.segmentSize + ')');
+        if ((plaintext.byteLength % this.segmentSize) !== 0) {
+            throw new Error('plaintext must be a block of size module segmentSize (' + this.segmentSize + ')');
         }
 
-        var encrypted = createBuffer(plaintext);
+        var encrypted = copyBlock(plaintext);
 
-        var xorSegment;
-        for (var i = 0; i < encrypted.length; i += this.segmentSize) {
-            xorSegment = this._aes.encrypt(this._shiftRegister);
+        for (var i = 0; i < encrypted.byteLength; i += this.segmentSize) {
+            var xorSegment = this._aes.encrypt(this._shiftRegister);
             for (var j = 0; j < this.segmentSize; j++) {
-                encrypted[i + j] ^= xorSegment[j];
+                encrypted.setUint8(i + j, encrypted.getUint8(i + j) ^ xorSegment.getUint8(j));
             }
 
             // Shift the register
-            this._shiftRegister.copy(this._shiftRegister, 0, this.segmentSize);
-            encrypted.copy(this._shiftRegister, 16 - this.segmentSize, i, i + this.segmentSize);
+            var sr = makeBlock();
+            memMove(this._shiftRegister, this.segmentSize, 16 - this.segmentSize, sr, 0);
+            memMove(encrypted, i, this.segmentSize, sr, 16 - this.segmentSize);
+            this._shiftRegister = sr;
         }
 
         return encrypted;
     }
 
     ModeOfOperationCFB.prototype.decrypt = function(ciphertext) {
-        if ((ciphertext.length % this.segmentSize) != 0) {
-            return new Error('ciphertext must be a block of size module segmentSize (' + this.segmentSize + ')');
+        if ((ciphertext.byteLength % this.segmentSize) !== 0) {
+            throw new Error('ciphertext must be a block of size module segmentSize (' + this.segmentSize + ')');
         }
 
-        var plaintext = createBuffer(ciphertext);
+        var plaintext = copyBlock(ciphertext);
 
         var xorSegment;
-        for (var i = 0; i < plaintext.length; i += this.segmentSize) {
+        for (var i = 0; i < plaintext.byteLength; i += this.segmentSize) {
             xorSegment = this._aes.encrypt(this._shiftRegister);
 
             for (var j = 0; j < this.segmentSize; j++) {
-                plaintext[i + j] ^= xorSegment[j];
+                plaintext.setUint8(i + j, plaintext.getUint8(i + j) ^ xorSegment.getUint8(j));
             }
 
             // Shift the register
-            this._shiftRegister.copy(this._shiftRegister, 0, this.segmentSize);
-            ciphertext.copy(this._shiftRegister, 16 - this.segmentSize, i, i + this.segmentSize);
+            var sr = makeBlock();
+            memMove(this._shiftRegister, this.segmentSize, 16 - this.segmentSize, sr, 0);
+            memMove(ciphertext, i, this.segmentSize, sr, 16 - this.segmentSize);
+            this._shiftRegister = sr;
         }
 
         return plaintext;
@@ -366,30 +350,26 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
      *  Mode Of Operation - Output Feedback (OFB)
      */
     var ModeOfOperationOFB = function(key, iv) {
+        if (iv && iv.byteLength !== 16)
+            throw new Error('initialation vector iv must be of length 16');
+
         this.description = "Output Feedback";
         this.name = "ofb";
-
-        if (iv === null) {
-            iv = createBuffer([0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-        } else if (iv.length != 16) {
-            return new Error('initialation vector iv must be of length 16');
-        }
-
-        this._lastPrecipher = createBuffer(iv);
+        this._lastPrecipher = iv ? copyBlock(iv) : makeBlock();
         this._lastPrecipherIndex = 16;
 
         this._aes = new AES(key);
     }
 
     ModeOfOperationOFB.prototype.encrypt = function(plaintext) {
-        var encrypted = createBuffer(plaintext);
+        var encrypted = copyBlock(plaintext);
 
-        for (var i = 0; i < encrypted.length; i++) {
+        for (var i = 0; i < encrypted.byteLength; i++) {
             if (this._lastPrecipherIndex === 16) {
                 this._lastPrecipher = this._aes.encrypt(this._lastPrecipher);
                 this._lastPrecipherIndex = 0;
             }
-            encrypted[i] ^= this._lastPrecipher[this._lastPrecipherIndex++];
+            encrypted.setUint8(i, encrypted.getUint8(i) ^ this._lastPrecipher.getUint8(this._lastPrecipherIndex++));
         }
 
         return encrypted;
@@ -406,7 +386,7 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
         if (initialValue === null || initialValue === undefined) { initialValue = 1; }
 
         if (typeof(initialValue) === 'number') {
-            this._counter = createBuffer([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+            this._counter = makeBlock();
             this.setValue(initialValue);
 
         } else {
@@ -420,24 +400,25 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
         }
 
         for (var index = 15; index >= 0; --index) {
-            this._counter[index] = value % 256;
+            this._counter.setUint8(index, value % 256);
             value = value >> 8;
         }
     }
 
     Counter.prototype.setBytes = function(bytes) {
-        if (bytes.length != 16) {
+        if (bytes.byteLength !== 16) {
             throw new Error('invalid counter bytes size (must be 16)');
         }
-        this._counter = createBuffer(bytes);
+        this._counter = copyBlock(bytes);
     };
 
     Counter.prototype.increment = function() {
         for (var i = 15; i >= 0; i--) {
-            if (this._counter[i] === 255) {
-                this._counter[i] = 0;
+            var digit = this._counter.getUint8(i);
+            if (digit === 255) {
+                this._counter.setUint8(i, 0);
             } else {
-                this._counter[i]++;
+                this._counter.setUint8(i, digit + 1);
                 break;
             }
         }
@@ -450,29 +431,22 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
     var ModeOfOperationCTR = function(key, counter) {
         this.description = "Counter";
         this.name = "ctr";
-
-        if (counter === null) {
-            counter = new Counter()
-        }
-
-        this._counter = counter;
-
+        this._counter = counter || new Counter();
         this._remainingCounter = null;
         this._remainingCounterIndex = 16;
-
         this._aes = new AES(key);
     }
 
     ModeOfOperationCTR.prototype.encrypt = function(plaintext) {
-        var encrypted = createBuffer(plaintext);
+        var encrypted = copyBlock(plaintext);
 
-        for (var i = 0; i < encrypted.length; i++) {
+        for (var i = 0; i < encrypted.byteLength; i++) {
             if (this._remainingCounterIndex === 16) {
                 this._remainingCounter = this._aes.encrypt(this._counter._counter);
                 this._remainingCounterIndex = 0;
                 this._counter.increment();
             }
-            encrypted[i] ^= this._remainingCounter[this._remainingCounterIndex++];
+            encrypted.setUint8(i, encrypted.getUint8(i) ^ this._remainingCounter.getUint8(this._remainingCounterIndex++));
         }
 
         return encrypted;
@@ -495,10 +469,6 @@ var convertStringToBytes = bufferModule.convertStringToBytes;
 module.exports = {
   AES: AES,
   Counter: Counter,
-  ModeOfOperation: ModeOfOperation,
-  util: {
-    convertBytesToString: convertBytesToString,
-    convertStringToBytes: convertStringToBytes
-  }
+  ModeOfOperation: ModeOfOperation
 };
 
