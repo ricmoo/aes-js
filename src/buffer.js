@@ -8,23 +8,19 @@ if (typeof Buffer === 'undefined') {
     return new DataView(buffer);
   };
 
-  copyBlock = function(block) {
-    var buffer = block.buffer.slice();
-    return new DataView(buffer);
-  };
 } else {
   makeBlock = function(size) {
     var DataView = require('buffer-dataview');
     var buffer = new Buffer(size || 16);
     return new DataView(buffer);
   };
-
-  copyBlock = function(block) {
-    var DataView = require('buffer-dataview');
-    var buffer = new Buffer(block.buffer);
-    return new DataView(buffer);
-  };
 }
+
+copyBlock = function(block) {
+  var c = makeBlock(block.byteLength);
+  memMove(block, 0, block.byteLength, c, 0);
+  return c;
+};
 
 memMove = function(src, srcOffset, srcLength, dst, dstOffset) {
   while (srcLength--) {
