@@ -533,14 +533,13 @@
     }
 
     Counter.prototype.setValue = function(value) {
-        if (typeof(initialValue) === 'number') {
+        if (typeof(value) !== 'number') {
             throw new Error('value must be a number');
         }
 
-        var index = 0, shift = 120;
-        while (shift >= 0) {
-            this._counter[index++] = (value >> shift) % 256;
-            shift -= 8;
+        for (var index = 15; index >= 0; --index) {
+            this._counter[index] = value % 256;
+            value = value >> 8;
         }
     }
 

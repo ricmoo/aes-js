@@ -14,7 +14,7 @@ function makeTest (options) {
     return function(test) {
         var result = new Buffer(options.incrementResult, 'hex');
 
-        if (options.number) {
+        if (options.hasOwnProperty('number')) {
 
             var counter = new aes.Counter(options.number);
             counter.increment();
@@ -54,10 +54,10 @@ function makeTest (options) {
 var Tests = {
     'test-counter-number': {
         'test-0': makeTest({number: 0, incrementResult: "00000000000000000000000000000001"}),
-        'test-1': makeTest({number: 0, incrementResult: "00000000000000000000000000000002"}),
-        'test-254': makeTest({number: 0, incrementResult: "000000000000000000000000000000ff"}),
-        'test-255': makeTest({number: 0, incrementResult: "00000000000000000000000000000100"}),
-        'test-256': makeTest({number: 0, incrementResult: "00000000000000000000000000000101"}),
+        'test-1': makeTest({number: 1, incrementResult: "00000000000000000000000000000002"}),
+        'test-254': makeTest({number: 254, incrementResult: "000000000000000000000000000000ff"}),
+        'test-255': makeTest({number: 255, incrementResult: "00000000000000000000000000000100"}),
+        'test-256': makeTest({number: 256, incrementResult: "00000000000000000000000000000101"}),
     },
     'test-counter-bytes': {
         'test-0000': makeTest({bytes: "00000000000000000000000000000000", incrementResult: "00000000000000000000000000000001"}),
