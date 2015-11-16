@@ -1,9 +1,8 @@
 {
-  "name": "aes-js",
-  "version": "0.2.0",
+  "name": "aes-es",
+  "version": "1.0.0",
   "bugs": {
-    "url": "http://github.com/ricmoo/aes-js/issues",
-    "email": "aes-js@ricmoo.com"
+    "url": "http://github.com/andy128k/aes-es/issues"
   },
   "description": "A pure JavaScript implementation of the AES block cipher and all common modes of operation.",
   "devDependencies": {
@@ -25,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/ricmoo/aes-js.git"
+    "url": "git://github.com/andy128k/aes-es.git"
   },
   "keywords": [
     "aes",
@@ -39,7 +38,10 @@
     "block",
     "cipher"
   ],
-  "author": "Richard Moore <me@ricmoo.com>",
+  "contributors": [
+    "Richard Moore <me@ricmoo.com>",
+    "Andrey Kutejko <andy128k@gmail.com>"
+  ],
   "license": "MIT",
   "dependencies": {
     "buffer-dataview": "0.0.2"

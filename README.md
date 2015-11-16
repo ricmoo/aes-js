@@ -1,4 +1,4 @@
-AES-JS
+AES-ES
 ======
 
 A pure JavaScript implementation of the AES block cipher algorithm and all common modes of operation (CBC, CFB, CTR, ECB and OFB).
@@ -16,26 +16,16 @@ Features
 API
 ===
 
-#### Node.js
-
-To install `aes-js` in your node.js project:
+To install `aes-es` in your node.js project:
 
 ```
-npm install aes-js
+npm install aes-es
 ```
 
 And to access it from within node, simply add:
 
 ```javascript
-var aesjs = require('aes-js');
-```
-
-#### Web Browser
-
-To use `aes-js` in a web page, add the following:
-
-```html
-<script type="text/javascript" src="https://raw.githubusercontent.com/ricmoo/aes-js/master/index.js"></script>
+var aesjs = require('aes-es');
 ```
 
 Keys
@@ -59,7 +49,6 @@ var key_192 = new Buffer([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 var key_256 = new Buffer([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
                16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
                29, 30, 31]);
-
 ```
 
 
@@ -277,19 +266,10 @@ Todo...
 Tests
 -----
 
-A test suite has been generated (`test/test-vectors.json`) from a known correct implementation, [pycrypto](https://www.dlitz.net/software/pycrypto/). To generate new test vectors, run `python generate-tests.py`.
+A test suite has been generated (`test/test-vectors.json`) from a known correct implementation, [pycrypto](https://www.dlitz.net/software/pycrypto/). To generate new test vectors, run `npm run generate-tests`.
 
-To run the node.js test suite:
+To run the test suite:
 
 ```
 npm test
 ```
-
-To run the web browser tests, open the `test/test.html` file in your browser.
-
-FAQ
----
-
-#### How do I get a question I have added?
-
-E-mail me at aes-js@ricmoo.com with any questions, suggestions, comments, et cetera.
