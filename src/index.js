@@ -17,11 +17,15 @@ var AES = require('./aes');
     }
 
     ModeOfOperationECB.prototype.encrypt = function(plaintext) {
-        return this._aes.encrypt(plaintext);
+        var result = makeBlock();
+        this._aes.encrypt(plaintext, result);
+        return result;
     }
 
     ModeOfOperationECB.prototype.decrypt = function(ciphertext) {
-        return this._aes.decrypt(ciphertext);
+        var result = makeBlock();
+        this._aes.decrypt(ciphertext, result);
+        return result;
     }
 
 
@@ -49,7 +53,7 @@ var AES = require('./aes');
             precipherblock.setUint8(i, precipherblock.getUint8(i) ^ this._lastCipherblock.getUint8(i));
         }
 
-        this._lastCipherblock = this._aes.encrypt(precipherblock);
+        this._aes.encrypt(precipherblock, this._lastCipherblock);
 
         return this._lastCipherblock;
     }
@@ -59,7 +63,8 @@ var AES = require('./aes');
             throw new Error('ciphertext must be a block of size 16');
         }
 
-        var plaintext = this._aes.decrypt(ciphertext);
+        var plaintext = makeBlock();
+        this._aes.decrypt(ciphertext, plaintext);
         for (var i = 0; i < 16; i++) {
             plaintext.setUint8(i, plaintext.getUint8(i) ^ this._lastCipherblock.getUint8(i));
         }
@@ -90,9 +95,10 @@ var AES = require('./aes');
         }
 
         var encrypted = copyBlock(plaintext);
+        var xorSegment = makeBlock();
 
         for (var i = 0; i < encrypted.byteLength; i += this.segmentSize) {
-            var xorSegment = this._aes.encrypt(this._shiftRegister);
+            this._aes.encrypt(this._shiftRegister, xorSegment);
             for (var j = 0; j < this.segmentSize; j++) {
                 encrypted.setUint8(i + j, encrypted.getUint8(i + j) ^ xorSegment.getUint8(j));
             }
@@ -114,9 +120,9 @@ var AES = require('./aes');
 
         var plaintext = copyBlock(ciphertext);
 
-        var xorSegment;
+        var xorSegment = makeBlock();
         for (var i = 0; i < plaintext.byteLength; i += this.segmentSize) {
-            xorSegment = this._aes.encrypt(this._shiftRegister);
+            this._aes.encrypt(this._shiftRegister, xorSegment);
 
             for (var j = 0; j < this.segmentSize; j++) {
                 plaintext.setUint8(i + j, plaintext.getUint8(i + j) ^ xorSegment.getUint8(j));
@@ -152,7 +158,7 @@ var AES = require('./aes');
 
         for (var i = 0; i < encrypted.byteLength; i++) {
             if (this._lastPrecipherIndex === 16) {
-                this._lastPrecipher = this._aes.encrypt(this._lastPrecipher);
+                this._aes.encrypt(this._lastPrecipher, this._lastPrecipher);
                 this._lastPrecipherIndex = 0;
             }
             encrypted.setUint8(i, encrypted.getUint8(i) ^ this._lastPrecipher.getUint8(this._lastPrecipherIndex++));
@@ -218,7 +224,7 @@ var AES = require('./aes');
         this.description = "Counter";
         this.name = "ctr";
         this._counter = counter || new Counter();
-        this._remainingCounter = null;
+        this._remainingCounter = makeBlock();
         this._remainingCounterIndex = 16;
         this._aes = new AES(key);
     }
@@ -228,7 +234,7 @@ var AES = require('./aes');
 
         for (var i = 0; i < encrypted.byteLength; i++) {
             if (this._remainingCounterIndex === 16) {
-                this._remainingCounter = this._aes.encrypt(this._counter._counter);
+                this._aes.encrypt(this._counter._counter, this._remainingCounter);
                 this._remainingCounterIndex = 0;
                 this._counter.increment();
             }

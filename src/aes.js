@@ -1,7 +1,5 @@
 "use strict";
 
-var makeBlock = require('./buffer').makeBlock;
-
 // Number of rounds by keysize
 var numberOfRounds = {16: 10, 24: 12, 32: 14};
 
@@ -805,7 +803,7 @@ AES.prototype._prepare = function() {
   }
 };
 
-AES.prototype.encrypt = function(plaintext) {
+AES.prototype.encrypt = function(plaintext, result) {
   if (plaintext.byteLength !== 16) {
     throw new Error('plaintext must be a block of size 16');
   }
@@ -832,19 +830,16 @@ AES.prototype.encrypt = function(plaintext) {
   }
 
   // the last round is special
-  var result = makeBlock(), tt;
   for (var i = 0; i < 4; i++) {
-    tt = this._Ke[rounds][i];
+    var tt = this._Ke[rounds][i];
     result.setUint8(4 * i    , (S[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff);
     result.setUint8(4 * i + 1, (S[(t[(i + 1) % 4] >> 16) & 0xff] ^ (tt >> 16)) & 0xff);
     result.setUint8(4 * i + 2, (S[(t[(i + 2) % 4] >>  8) & 0xff] ^ (tt >>  8)) & 0xff);
     result.setUint8(4 * i + 3, (S[ t[(i + 3) % 4]        & 0xff] ^  tt       ) & 0xff);
   }
-
-  return result;
 };
 
-AES.prototype.decrypt = function(ciphertext) {
+AES.prototype.decrypt = function(ciphertext, result) {
   if (ciphertext.byteLength !== 16) {
     throw new Error('ciphertext must be a block of size 16');
   }
@@ -871,16 +866,13 @@ AES.prototype.decrypt = function(ciphertext) {
   }
 
   // the last round is special
-  var result = makeBlock(), tt;
   for (var i = 0; i < 4; i++) {
-    tt = this._Kd[rounds][i];
+    var tt = this._Kd[rounds][i];
     result.setUint8(4 * i    , (Si[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff);
     result.setUint8(4 * i + 1, (Si[(t[(i + 3) % 4] >> 16) & 0xff] ^ (tt >> 16)) & 0xff);
     result.setUint8(4 * i + 2, (Si[(t[(i + 2) % 4] >>  8) & 0xff] ^ (tt >>  8)) & 0xff);
     result.setUint8(4 * i + 3, (Si[ t[(i + 1) % 4]        & 0xff] ^  tt       ) & 0xff);
   }
-
-  return result;
 };
 
 module.exports = AES;
