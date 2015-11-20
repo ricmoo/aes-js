@@ -40,9 +40,14 @@ describe('Examples', function() {
       for (var i = 0; i < options.plaintext.length; i++) {
         var plaintext = octetsToBlock(options.plaintext[i]);
         var ciphertext = octetsToBlock(options.encrypted[i]);
+        var encrypted = makeBlock(plaintext.byteLength);
+        var decrypted = makeBlock(ciphertext.byteLength);
 
-        expect(encrypter.encrypt(plaintext)).toEqual(ciphertext);
-        expect(decrypter.decrypt(ciphertext)).toEqual(plaintext);
+        encrypter.encrypt(plaintext, encrypted);
+        decrypter.decrypt(ciphertext, decrypted);
+
+        expect(encrypted).toEqual(ciphertext);
+        expect(decrypted).toEqual(plaintext);
       }
     });
   });

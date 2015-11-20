@@ -16,16 +16,12 @@ var AES = require('./aes');
         this._aes = new AES(key);
     }
 
-    ModeOfOperationECB.prototype.encrypt = function(plaintext) {
-        var result = makeBlock();
+    ModeOfOperationECB.prototype.encrypt = function(plaintext, result) {
         this._aes.encrypt(plaintext, result);
-        return result;
     }
 
-    ModeOfOperationECB.prototype.decrypt = function(ciphertext) {
-        var result = makeBlock();
+    ModeOfOperationECB.prototype.decrypt = function(ciphertext, result) {
         this._aes.decrypt(ciphertext, result);
-        return result;
     }
 
 
@@ -43,35 +39,37 @@ var AES = require('./aes');
         this._aes = new AES(key);
     }
 
-    ModeOfOperationCBC.prototype.encrypt = function(plaintext) {
+    ModeOfOperationCBC.prototype.encrypt = function(plaintext, result) {
         if (plaintext.byteLength !== 16) {
             throw new Error('plaintext must be a block of size 16');
         }
-
-        var precipherblock = copyBlock(plaintext);
-        for (var i = 0; i < 16; i++) {
-            precipherblock.setUint8(i, precipherblock.getUint8(i) ^ this._lastCipherblock.getUint8(i));
+        if (result.byteLength !== 16) {
+            throw new Error('result must be a block of size 16');
         }
 
-        this._aes.encrypt(precipherblock, this._lastCipherblock);
+        for (var i = 0; i < 16; i++) {
+            this._lastCipherblock.setUint8(i, plaintext.getUint8(i) ^ this._lastCipherblock.getUint8(i));
+        }
 
-        return this._lastCipherblock;
+        this._aes.encrypt(this._lastCipherblock, this._lastCipherblock);
+
+        memMove(this._lastCipherblock, 0, 16, result, 0);
     }
 
-    ModeOfOperationCBC.prototype.decrypt = function(ciphertext) {
+    ModeOfOperationCBC.prototype.decrypt = function(ciphertext, result) {
         if (ciphertext.byteLength !== 16) {
             throw new Error('ciphertext must be a block of size 16');
         }
+        if (result.byteLength !== 16) {
+            throw new Error('result must be a block of size 16');
+        }
 
-        var plaintext = makeBlock();
-        this._aes.decrypt(ciphertext, plaintext);
+        this._aes.decrypt(ciphertext, result);
         for (var i = 0; i < 16; i++) {
-            plaintext.setUint8(i, plaintext.getUint8(i) ^ this._lastCipherblock.getUint8(i));
+            result.setUint8(i, result.getUint8(i) ^ this._lastCipherblock.getUint8(i));
         }
 
         this._lastCipherblock = copyBlock(ciphertext);
-      
-        return plaintext;
     }
 
 
@@ -89,9 +87,12 @@ var AES = require('./aes');
         this._aes = new AES(key);
     }
 
-    ModeOfOperationCFB.prototype.encrypt = function(plaintext) {
+    ModeOfOperationCFB.prototype.encrypt = function(plaintext, result) {
         if ((plaintext.byteLength % this.segmentSize) !== 0) {
             throw new Error('plaintext must be a block of size module segmentSize (' + this.segmentSize + ')');
+        }
+        if ((result.byteLength % this.segmentSize) !== 0) {
+            throw new Error('result must be a block of size module segmentSize (' + this.segmentSize + ')');
         }
 
         var encrypted = copyBlock(plaintext);
@@ -110,12 +111,15 @@ var AES = require('./aes');
             this._shiftRegister = sr;
         }
 
-        return encrypted;
+        memMove(encrypted, 0, encrypted.byteLength, result, 0);
     }
 
-    ModeOfOperationCFB.prototype.decrypt = function(ciphertext) {
+    ModeOfOperationCFB.prototype.decrypt = function(ciphertext, result) {
         if ((ciphertext.byteLength % this.segmentSize) !== 0) {
             throw new Error('ciphertext must be a block of size module segmentSize (' + this.segmentSize + ')');
+        }
+        if ((result.byteLength % this.segmentSize) !== 0) {
+            throw new Error('result must be a block of size module segmentSize (' + this.segmentSize + ')');
         }
 
         var plaintext = copyBlock(ciphertext);
@@ -135,7 +139,7 @@ var AES = require('./aes');
             this._shiftRegister = sr;
         }
 
-        return plaintext;
+        memMove(plaintext, 0, plaintext.byteLength, result, 0);
     }
 
     /**
@@ -153,7 +157,7 @@ var AES = require('./aes');
         this._aes = new AES(key);
     }
 
-    ModeOfOperationOFB.prototype.encrypt = function(plaintext) {
+    ModeOfOperationOFB.prototype.encrypt = function(plaintext, result) {
         var encrypted = copyBlock(plaintext);
 
         for (var i = 0; i < encrypted.byteLength; i++) {
@@ -164,7 +168,7 @@ var AES = require('./aes');
             encrypted.setUint8(i, encrypted.getUint8(i) ^ this._lastPrecipher.getUint8(this._lastPrecipherIndex++));
         }
 
-        return encrypted;
+        memMove(encrypted, 0, encrypted.byteLength, result, 0);
     }
 
     // Decryption is symetric
@@ -229,7 +233,7 @@ var AES = require('./aes');
         this._aes = new AES(key);
     }
 
-    ModeOfOperationCTR.prototype.encrypt = function(plaintext) {
+    ModeOfOperationCTR.prototype.encrypt = function(plaintext, result) {
         var encrypted = copyBlock(plaintext);
 
         for (var i = 0; i < encrypted.byteLength; i++) {
@@ -241,7 +245,7 @@ var AES = require('./aes');
             encrypted.setUint8(i, encrypted.getUint8(i) ^ this._remainingCounter.getUint8(this._remainingCounterIndex++));
         }
 
-        return encrypted;
+        memMove(encrypted, 0, encrypted.byteLength, result, 0);
     }
 
     // Decryption is symetric
