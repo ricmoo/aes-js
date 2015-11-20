@@ -48,6 +48,10 @@ describe('Examples', function() {
 
         expect(encrypted).toEqual(ciphertext);
         expect(decrypted).toEqual(plaintext);
+
+        // input buffers are not modified
+        expect(octetsToBlock(options.plaintext[i])).toEqual(plaintext);
+        expect(octetsToBlock(options.encrypted[i])).toEqual(ciphertext);
       }
     });
   });

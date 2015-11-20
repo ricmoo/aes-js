@@ -95,23 +95,19 @@ var AES = require('./aes');
             throw new Error('result must be a block of size module segmentSize (' + this.segmentSize + ')');
         }
 
-        var encrypted = copyBlock(plaintext);
         var xorSegment = makeBlock();
-
-        for (var i = 0; i < encrypted.byteLength; i += this.segmentSize) {
+        for (var i = 0; i < plaintext.byteLength; i += this.segmentSize) {
             this._aes.encrypt(this._shiftRegister, xorSegment);
             for (var j = 0; j < this.segmentSize; j++) {
-                encrypted.setUint8(i + j, encrypted.getUint8(i + j) ^ xorSegment.getUint8(j));
+                result.setUint8(i + j, plaintext.getUint8(i + j) ^ xorSegment.getUint8(j));
             }
 
             // Shift the register
             var sr = makeBlock();
             memMove(this._shiftRegister, this.segmentSize, 16 - this.segmentSize, sr, 0);
-            memMove(encrypted, i, this.segmentSize, sr, 16 - this.segmentSize);
+            memMove(result, i, this.segmentSize, sr, 16 - this.segmentSize);
             this._shiftRegister = sr;
         }
-
-        memMove(encrypted, 0, encrypted.byteLength, result, 0);
     }
 
     ModeOfOperationCFB.prototype.decrypt = function(ciphertext, result) {
@@ -122,14 +118,11 @@ var AES = require('./aes');
             throw new Error('result must be a block of size module segmentSize (' + this.segmentSize + ')');
         }
 
-        var plaintext = copyBlock(ciphertext);
-
         var xorSegment = makeBlock();
-        for (var i = 0; i < plaintext.byteLength; i += this.segmentSize) {
+        for (var i = 0; i < ciphertext.byteLength; i += this.segmentSize) {
             this._aes.encrypt(this._shiftRegister, xorSegment);
-
             for (var j = 0; j < this.segmentSize; j++) {
-                plaintext.setUint8(i + j, plaintext.getUint8(i + j) ^ xorSegment.getUint8(j));
+                result.setUint8(i + j, ciphertext.getUint8(i + j) ^ xorSegment.getUint8(j));
             }
 
             // Shift the register
@@ -138,8 +131,6 @@ var AES = require('./aes');
             memMove(ciphertext, i, this.segmentSize, sr, 16 - this.segmentSize);
             this._shiftRegister = sr;
         }
-
-        memMove(plaintext, 0, plaintext.byteLength, result, 0);
     }
 
     /**
@@ -158,17 +149,14 @@ var AES = require('./aes');
     }
 
     ModeOfOperationOFB.prototype.encrypt = function(plaintext, result) {
-        var encrypted = copyBlock(plaintext);
-
-        for (var i = 0; i < encrypted.byteLength; i++) {
+        for (var i = 0; i < plaintext.byteLength; i++) {
             if (this._lastPrecipherIndex === 16) {
                 this._aes.encrypt(this._lastPrecipher, this._lastPrecipher);
                 this._lastPrecipherIndex = 0;
             }
-            encrypted.setUint8(i, encrypted.getUint8(i) ^ this._lastPrecipher.getUint8(this._lastPrecipherIndex++));
+            result.setUint8(i, plaintext.getUint8(i) ^ this._lastPrecipher.getUint8(this._lastPrecipherIndex));
+            this._lastPrecipherIndex++;
         }
-
-        memMove(encrypted, 0, encrypted.byteLength, result, 0);
     }
 
     // Decryption is symetric
@@ -234,18 +222,14 @@ var AES = require('./aes');
     }
 
     ModeOfOperationCTR.prototype.encrypt = function(plaintext, result) {
-        var encrypted = copyBlock(plaintext);
-
-        for (var i = 0; i < encrypted.byteLength; i++) {
+        for (var i = 0; i < plaintext.byteLength; i++) {
             if (this._remainingCounterIndex === 16) {
                 this._aes.encrypt(this._counter._counter, this._remainingCounter);
                 this._remainingCounterIndex = 0;
                 this._counter.increment();
             }
-            encrypted.setUint8(i, encrypted.getUint8(i) ^ this._remainingCounter.getUint8(this._remainingCounterIndex++));
+            result.setUint8(i, plaintext.getUint8(i) ^ this._remainingCounter.getUint8(this._remainingCounterIndex++));
         }
-
-        memMove(encrypted, 0, encrypted.byteLength, result, 0);
     }
 
     // Decryption is symetric
