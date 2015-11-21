@@ -1,3 +1,4 @@
+/*global describe, it, expect*/
 var aes = require('../src/index');
 var blocks = require('./helpers').blocks;
 

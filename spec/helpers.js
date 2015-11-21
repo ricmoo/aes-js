@@ -1,3 +1,5 @@
+/*global jasmine, beforeEach*/
+
 function isArray(a) {
   return a.constructor.name === 'Array' || a.constructor.name === 'Uint8Array';
 }
