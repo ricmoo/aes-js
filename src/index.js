@@ -9,23 +9,7 @@ function xorBlocks(result, first, second) {
   }
 }
 
-    /**
-     *  Mode Of Operation - Electonic Codebook (ECB)
-     */
-    var ModeOfOperationECB = function(key) {
-        this.description = "Electronic Code Block";
-        this.name = "ecb";
-
-        this._aes = new AES(key);
-    }
-
-    ModeOfOperationECB.prototype.encrypt = function(plaintext, result) {
-        this._aes.encrypt(plaintext, result);
-    }
-
-    ModeOfOperationECB.prototype.decrypt = function(ciphertext, result) {
-        this._aes.decrypt(ciphertext, result);
-    }
+var ecb = require('./ecb');
 
 
     /**
@@ -234,7 +218,7 @@ function xorBlocks(result, first, second) {
 
     // The bsic modes of operation as a map
     var ModeOfOperation = {
-        ecb: ModeOfOperationECB,
+        ecb: ecb,
         cbc: ModeOfOperationCBC,
         cfb: ModeOfOperationCFB,
         ofb: ModeOfOperationOFB,
