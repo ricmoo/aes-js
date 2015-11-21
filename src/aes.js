@@ -700,10 +700,17 @@ var U4 = [0x00000000, 0x090d0b0e, 0x121a161c, 0x1b171d12, 0x24342c38,
 	  0x6bae84bb, 0x62a38fb5, 0x5d80be9f, 0x548db591, 0x4f9aa883,
 	  0x4697a38d];
 
+function getUint32(octets, index) {
+  return ((octets[index    ] & 0xff) << 24) +
+         ((octets[index + 1] & 0xff) << 16) +
+         ((octets[index + 2] & 0xff) <<  8) +
+         ((octets[index + 3] & 0xff)      );
+}
+
 function convertToInt32(bytes) {
   var result = [];
-  for (var i = 0; i < bytes.byteLength; i += 4) {
-    result.push(bytes.getUint32(i, false));
+  for (var i = 0; i < bytes.length; i += 4) {
+    result.push(getUint32(bytes, i));
   }
   return result;
 };
@@ -715,7 +722,7 @@ var AES = function(key) {
 
 AES.prototype._prepare = function() {
 
-  var rounds = numberOfRounds[this.key.byteLength];
+  var rounds = numberOfRounds[this.key.length];
   if (rounds === null) {
     throw new Error('invalid key size (must be length 16, 24 or 32)');
   }
@@ -732,7 +739,7 @@ AES.prototype._prepare = function() {
   }
 
   var roundKeyCount = (rounds + 1) * 4;
-  var KC = this.key.byteLength / 4;
+  var KC = this.key.length / 4;
 
   // convert the key into ints
   var tk = convertToInt32(this.key);
@@ -804,7 +811,7 @@ AES.prototype._prepare = function() {
 };
 
 AES.prototype.encrypt = function(plaintext, result) {
-  if (plaintext.byteLength !== 16) {
+  if (plaintext.length !== 16) {
     throw new Error('plaintext must be a block of size 16');
   }
 
@@ -814,7 +821,7 @@ AES.prototype.encrypt = function(plaintext, result) {
   // convert plaintext to (ints ^ key)
   var t = [];
   for (var i = 0; i < 4; i++) {
-    t.push(plaintext.getUint32(i * 4, false) ^ this._Ke[0][i]);
+    t.push(getUint32(plaintext, i * 4)  ^ this._Ke[0][i]);
   }
 
   // apply round transforms
@@ -832,15 +839,15 @@ AES.prototype.encrypt = function(plaintext, result) {
   // the last round is special
   for (var i = 0; i < 4; i++) {
     var tt = this._Ke[rounds][i];
-    result.setUint8(4 * i    , (S[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff);
-    result.setUint8(4 * i + 1, (S[(t[(i + 1) % 4] >> 16) & 0xff] ^ (tt >> 16)) & 0xff);
-    result.setUint8(4 * i + 2, (S[(t[(i + 2) % 4] >>  8) & 0xff] ^ (tt >>  8)) & 0xff);
-    result.setUint8(4 * i + 3, (S[ t[(i + 3) % 4]        & 0xff] ^  tt       ) & 0xff);
+    result[4 * i    ] = (S[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
+    result[4 * i + 1] = (S[(t[(i + 1) % 4] >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
+    result[4 * i + 2] = (S[(t[(i + 2) % 4] >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
+    result[4 * i + 3] = (S[ t[(i + 3) % 4]        & 0xff] ^  tt       ) & 0xff;
   }
 };
 
 AES.prototype.decrypt = function(ciphertext, result) {
-  if (ciphertext.byteLength !== 16) {
+  if (ciphertext.length !== 16) {
     throw new Error('ciphertext must be a block of size 16');
   }
 
@@ -850,7 +857,7 @@ AES.prototype.decrypt = function(ciphertext, result) {
   // convert plaintext to (ints ^ key)
   var t = [];
   for (var i = 0; i < 4; i++) {
-    t.push(ciphertext.getUint32(i * 4, false) ^ this._Kd[0][i]);
+    t.push(getUint32(ciphertext, i * 4) ^ this._Kd[0][i]);
   }
 
   // apply round transforms
@@ -868,10 +875,10 @@ AES.prototype.decrypt = function(ciphertext, result) {
   // the last round is special
   for (var i = 0; i < 4; i++) {
     var tt = this._Kd[rounds][i];
-    result.setUint8(4 * i    , (Si[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff);
-    result.setUint8(4 * i + 1, (Si[(t[(i + 3) % 4] >> 16) & 0xff] ^ (tt >> 16)) & 0xff);
-    result.setUint8(4 * i + 2, (Si[(t[(i + 2) % 4] >>  8) & 0xff] ^ (tt >>  8)) & 0xff);
-    result.setUint8(4 * i + 3, (Si[ t[(i + 1) % 4]        & 0xff] ^  tt       ) & 0xff);
+    result[4 * i    ] = (Si[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
+    result[4 * i + 1] = (Si[(t[(i + 3) % 4] >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
+    result[4 * i + 2] = (Si[(t[(i + 2) % 4] >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
+    result[4 * i + 3] = (Si[ t[(i + 1) % 4]        & 0xff] ^  tt       ) & 0xff;
   }
 };
 

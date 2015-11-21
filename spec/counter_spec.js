@@ -1,12 +1,10 @@
 var aes = require('../src/index');
-var bufferModule = require('../src/buffer');
-var makeBlock = bufferModule.makeBlock;
 var blocks = require('./helpers').blocks;
 
 function hexToBlock(data) {
-  var block = makeBlock(data.length / 2);
+  var block = new Array(data.length / 2);
   for (var i = 0; i < data.length; i += 2) {
-    block.setUint8(i / 2, parseInt(data.substring(i, i + 2), 16));
+    block[i / 2] = parseInt(data.substring(i, i + 2), 16);
   }
   return block;
 }

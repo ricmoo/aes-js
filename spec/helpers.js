@@ -1,10 +1,14 @@
+function isArray(a) {
+  return a.constructor.name === 'Array' || a.constructor.name === 'Uint8Array';
+}
+  
 function blockEquality(a, b) {
-  if (a.constructor.name !== 'DataView' || b.constructor.name !== 'DataView')
+  if (!isArray(a) || !isArray(b))
     return undefined;
-  if (a.byteLength !== b.byteLength)
+  if (a.length !== b.length)
     return false;
-  for (var i = 0; i < a.byteLength; i++) {
-    if (a.getUint8(i) !== b.getUint8(i))
+  for (var i = 0; i < a.length; i++) {
+    if (a[i] !== b[i])
       return false;
   }
   return true;

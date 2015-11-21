@@ -1,11 +1,10 @@
 var aes = require('../src/index');
-var makeBlock = require('../src/buffer').makeBlock;
 var blocks = require('./helpers').blocks;
 
 function octetsToBlock(octets) {
-  var block = makeBlock(octets.length);
+  var block = new Array(octets.length);
   for (var i = 0; i < octets.length; ++i)
-    block.setUint8(i, octets[i]);
+    block[i] = octets[i];
   return block;
 }
 
@@ -40,8 +39,8 @@ describe('Examples', function() {
       for (var i = 0; i < options.plaintext.length; i++) {
         var plaintext = octetsToBlock(options.plaintext[i]);
         var ciphertext = octetsToBlock(options.encrypted[i]);
-        var encrypted = makeBlock(plaintext.byteLength);
-        var decrypted = makeBlock(ciphertext.byteLength);
+        var encrypted = new Array(plaintext.length);
+        var decrypted = new Array(ciphertext.length);
 
         encrypter.encrypt(plaintext, encrypted);
         decrypter.decrypt(ciphertext, decrypted);

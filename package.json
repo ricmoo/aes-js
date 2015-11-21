@@ -16,7 +16,7 @@
   },
   "main": "src/index.js",
   "scripts": {
-    "lint": "eslint index.js src test",
+    "lint": "eslint index.js src spec",
     "generate-tests": "python generate-tests.py > spec/fixtures/test-vectors.js",
     "test-node": "jasmine",
     "test-browser": "karma start",
@@ -43,7 +43,5 @@
     "Andrey Kutejko <andy128k@gmail.com>"
   ],
   "license": "MIT",
-  "dependencies": {
-    "buffer-dataview": "0.0.2"
-  }
+  "dependencies": {}
 }
