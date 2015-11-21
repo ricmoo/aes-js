@@ -1,41 +1,11 @@
 "use strict";
 
 var AES = require('./aes');
-var copyIV = require('./iv');
 
 var ecb = require('./ecb');
 var cbc = require('./cbc');
 var cfb = require('./cfb');
-
-
-    /**
-     *  Mode Of Operation - Output Feedback (OFB)
-     */
-    var ModeOfOperationOFB = function(key, iv) {
-        if (iv && iv.length !== 16)
-            throw new Error('initialation vector iv must be of length 16');
-
-        this.description = "Output Feedback";
-        this.name = "ofb";
-        this._lastPrecipher = copyIV(iv);
-        this._lastPrecipherIndex = 16;
-
-        this._aes = new AES(key);
-    }
-
-    ModeOfOperationOFB.prototype.encrypt = function(plaintext, result) {
-        for (var i = 0; i < plaintext.length; i++) {
-            if (this._lastPrecipherIndex === 16) {
-                this._aes.encrypt(this._lastPrecipher, this._lastPrecipher);
-                this._lastPrecipherIndex = 0;
-            }
-            result[i] = plaintext[i] ^ this._lastPrecipher[this._lastPrecipherIndex];
-            this._lastPrecipherIndex++;
-        }
-    }
-
-    // Decryption is symetric
-    ModeOfOperationOFB.prototype.decrypt = ModeOfOperationOFB.prototype.encrypt;
+var ofb = require('./ofb');
 
 
     /**
@@ -116,7 +86,7 @@ var cfb = require('./cfb');
         ecb: ecb,
         cbc: cbc,
         cfb: cfb,
-        ofb: ModeOfOperationOFB,
+        ofb: ofb,
         ctr: ModeOfOperationCTR
     };
 
