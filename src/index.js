@@ -1,12 +1,7 @@
 "use strict";
 
 var AES = require('./aes');
-
-var zeroes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-function copyIV(iv) {
-  return Array.prototype.slice.call(iv || zeroes, 0, 16);
-}
+var copyIV = require('./iv');
 
 function xorBlocks(result, first, second) {
   for (var i = 0; i < result.length; i++) {
