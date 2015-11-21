@@ -2,26 +2,19 @@
 var aes = require('../src/index');
 var blocks = require('./helpers').blocks;
 
-function octetsToBlock(octets) {
-  var block = new Array(octets.length);
-  for (var i = 0; i < octets.length; ++i)
-    block[i] = octets[i];
-  return block;
-}
-
 function makeCrypter(options) {
-  var key = octetsToBlock(options.key);
+  var key = options.key;
   switch (options.modeOfOperation) {
   case 'ecb':
-    return new aes.ModeOfOperation.ecb(key);
+    return new aes.ECB(key);
   case 'cfb':
-    return new aes.ModeOfOperation.cfb(key, octetsToBlock(options.iv), options.segmentSize);
+    return new aes.CFB(key, options.iv, options.segmentSize);
   case 'ofb':
-    return new aes.ModeOfOperation.ofb(key, octetsToBlock(options.iv));
+    return new aes.OFB(key, options.iv);
   case 'cbc':
-    return new aes.ModeOfOperation.cbc(key, octetsToBlock(options.iv));
+    return new aes.CBC(key, options.iv);
   case 'ctr':
-    return new aes.ModeOfOperation.ctr(key, new aes.Counter(0));
+    return new aes.CTR(key, new aes.Counter(0));
   default:
     throw new Error('unknwon mode of operation');
   }
@@ -38,8 +31,8 @@ describe('Examples', function() {
       var decrypter = makeCrypter(options);
 
       for (var i = 0; i < options.plaintext.length; i++) {
-        var plaintext = octetsToBlock(options.plaintext[i]);
-        var ciphertext = octetsToBlock(options.encrypted[i]);
+        var plaintext = options.plaintext[i].slice();
+        var ciphertext = options.encrypted[i].slice();
         var encrypted = new Array(plaintext.length);
         var decrypted = new Array(ciphertext.length);
 
@@ -50,8 +43,8 @@ describe('Examples', function() {
         expect(decrypted).toEqual(plaintext);
 
         // input buffers are not modified
-        expect(octetsToBlock(options.plaintext[i])).toEqual(plaintext);
-        expect(octetsToBlock(options.encrypted[i])).toEqual(ciphertext);
+        expect(options.plaintext[i]).toEqual(plaintext);
+        expect(options.encrypted[i]).toEqual(ciphertext);
       }
     });
   });
