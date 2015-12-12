@@ -179,7 +179,7 @@
     AES.prototype._prepare = function() {
 
         var rounds = numberOfRounds[this.key.length];
-        if (rounds === null) {
+        if (rounds == null) {
             throw new Error('invalid key size (must be length 16, 24 or 32)');
         }
 
