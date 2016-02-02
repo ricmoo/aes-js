@@ -18,7 +18,7 @@
     "block",
     "cipher"
   ],
-  "homepage": "https://github.com/luckysw/aes-js",
+  "homepage": "https://github.com/ricmoo/aes-js",
   "moduleType": [
     "globals"
   ],
