@@ -293,3 +293,13 @@ FAQ
 #### How do I get a question I have added?
 
 E-mail me at aes-js@ricmoo.com with any questions, suggestions, comments, et cetera.
+
+
+Donations
+---------
+
+Obviously, it's all licensed under the MIT license, so use it as you wish; but if you'd like to buy me a coffee, I won't complain. =)
+
+- Bitcoin - `1K1Ax9t6uJmjE4X5xcoVuyVTsiLrYRqe2P`
+- Dogecoin - `DFhgqVuaboxFnGQssyX84ZuV5r6aBRz8QJ`
+- Testnet3 - `n1F2Eb6cknqqknUPp7m9oBNMgXFuaDowvF`
