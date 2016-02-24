@@ -1,33 +1,45 @@
 "use strict";
 
-
 (function() {
     var root = this;
     var previous_mymodule = root.mymodule;
 
     var createBuffer = null, convertBytesToString, convertStringToBytes = null;
 
-    if (typeof Buffer === 'undefined') {
-        createBuffer = function(arg) {
+    var slowCreateBuffer = function(arg) {
 
-            // Passed in a single number, the length to pre-allocate
-            if (typeof arg === 'number') {
-                var result = [];
-                for (var i = 0; i < arg; i++) {
-                    result.push(0);
-                }
-                return result;
+        // Passed in a single number, the length to pre-allocate
+        if (typeof arg === 'number') {
+            var result = [];
+            for (var i = 0; i < arg; i++) {
+                result.push(0);
+            }
+            return result;
 
-            } else  {
-                // Make sure they are passing sensible data
-                for (var i = 0; i < arg.length; i++) {
-                    if (arg[i] < 0 || arg[i] >= 256 || typeof arg[i] !== 'number') {
-                        throw new Error('invalid byte at index ' + i + '(' + arg[i] + ')');
-                    }
+        } else  {
+            // Make sure they are passing sensible data
+            for (var i = 0; i < arg.length; i++) {
+                if (arg[i] < 0 || arg[i] >= 256 || typeof arg[i] !== 'number') {
+                    throw new Error('invalid byte at index ' + i + '(' + arg[i] + ')');
                 }
+            }
+
+            // Most array-like things should support this
+            if (arg.slice) {
                 return arg.slice(0);
             }
+
+            // Something *weird*; copy it into an array (see PR#2)
+            var result = [];
+            for (var i = 0; i < arg.length; i++) {
+                result.push(arg[i]);
+            }
+            return result;
         }
+    }
+
+    if (typeof(Buffer) === 'undefined') {
+        createBuffer = slowCreateBuffer;
 
         Array.prototype.copy = function(targetArray, targetStart, sourceStart, sourceEnd) {
             if (targetStart == null) { targetStart = 0; }
@@ -621,7 +633,8 @@
         ModeOfOperation: ModeOfOperation,
         util: {
             convertBytesToString: convertBytesToString,
-            convertStringToBytes: convertStringToBytes
+            convertStringToBytes: convertStringToBytes,
+            _slowCreateBuffer: slowCreateBuffer
         }
     };
 
@@ -633,7 +646,8 @@
         exports.ModeOfOperation = ModeOfOperation;
         exports.util = {
             convertBytesToString: convertBytesToString,
-            convertStringToBytes: convertStringToBytes
+            convertStringToBytes: convertStringToBytes,
+            _slowCreateBuffer: slowCreateBuffer
         }
         /*
         if(typeof module !== 'undefined' && module.exports) {
