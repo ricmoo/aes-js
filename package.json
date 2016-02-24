@@ -1,9 +1,9 @@
 {
   "name": "aes-js",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "bugs": {
     "url": "http://github.com/ricmoo/aes-js/issues",
-    "email": "aes-js@ricmoo.com"
+    "email": "github@ricmoo.com"
   },
   "description": "A pure JavaScript implementation of the AES block cipher and all common modes of operation.",
   "devDependencies": {
@@ -11,7 +11,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "node test/test-aes.js && node test/test-counter.js"
+    "test": "node test/test-aes.js && node test/test-counter.js && node test/test-buffer.js"
   },
   "repository": {
     "type": "git",
