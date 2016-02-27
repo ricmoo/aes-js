@@ -1,8 +1,9 @@
 AES-JS
 ======
 
-A pure JavaScript implementation of the AES block cipher algorithm and all common modes of operation (CBC, CFB, CTR, ECB and OFB).
+[![npm version](https://badge.fury.io/js/aes-js.svg)](https://badge.fury.io/js/aes-js)
 
+A pure JavaScript implementation of the AES block cipher algorithm and all common modes of operation (CBC, CFB, CTR, ECB and OFB).
 
 Features
 --------
