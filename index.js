@@ -638,9 +638,13 @@
         }
     };
 
-
-
-    if(typeof exports !== 'undefined') {
+    //AMD.
+    if (typeof define === 'function' && define.amd) {
+        define(function () {
+            return aesjs;
+        });
+	}
+    else if(typeof exports !== 'undefined') {
         exports.AES = AES;
         exports.Counter = Counter;
         exports.ModeOfOperation = ModeOfOperation;
