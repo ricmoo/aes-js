@@ -4,6 +4,17 @@
 
     var createBuffer = null, convertBytesToString, convertStringToBytes = null;
 
+    // copy the array
+    var copyArray = function (sourceArray, targetArray, targetStart, sourceStart, sourceEnd) {
+        if (targetStart == null) { targetStart = 0; }
+        if (sourceStart == null) { sourceStart = 0; }
+        if (sourceEnd == null) { sourceEnd = sourceArray.length; }
+        for (var i = sourceStart; i < sourceEnd; i++) {
+            targetArray[targetStart++] = sourceArray[i];
+        }
+    }
+
+
     var slowCreateBuffer = function(arg) {
 
         // Passed in a single number, the length to pre-allocate
@@ -38,15 +49,6 @@
 
     if (typeof(Buffer) === 'undefined') {
         createBuffer = slowCreateBuffer;
-
-        Array.prototype.copy = function(targetArray, targetStart, sourceStart, sourceEnd) {
-            if (targetStart == null) { targetStart = 0; }
-            if (sourceStart == null) { sourceStart = 0; }
-            if (sourceEnd == null) { sourceEnd = this.length; }
-            for (var i = sourceStart; i < sourceEnd; i++) {
-                targetArray[targetStart++] = this[i];
-            }
-        }
 
         convertStringToBytes = function(text, encoding) {
 
@@ -417,7 +419,8 @@
             plaintext[i] ^= this._lastCipherblock[i];
         }
 
-        ciphertext.copy(this._lastCipherblock);
+        
+        copyArray(ciphertext, this._lastCipherblock);
 
         return plaintext;
     }
@@ -460,8 +463,8 @@
             }
 
             // Shift the register
-            this._shiftRegister.copy(this._shiftRegister, 0, this.segmentSize);
-            encrypted.copy(this._shiftRegister, 16 - this.segmentSize, i, i + this.segmentSize);
+            copyArray(this._shiftRegister, this._shiftRegister, 0, this.segmentSize);
+            copyArray(encrypted, this._shiftRegister, 16 - this.segmentSize, i, i + this.segmentSize);
         }
 
         return encrypted;
@@ -483,8 +486,8 @@
             }
 
             // Shift the register
-            this._shiftRegister.copy(this._shiftRegister, 0, this.segmentSize);
-            ciphertext.copy(this._shiftRegister, 16 - this.segmentSize, i, i + this.segmentSize);
+            copyArray(this._shiftRegister, this._shiftRegister, 0, this.segmentSize);
+            copyArray(ciphertext, this._shiftRegister, 16 - this.segmentSize, i, i + this.segmentSize);
         }
 
         return plaintext;
