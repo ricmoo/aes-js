@@ -2,7 +2,6 @@
 
 (function() {
     var root = this;
-    var previous_mymodule = root.mymodule;
 
     var createBuffer = null, convertBytesToString, convertStringToBytes = null;
 
