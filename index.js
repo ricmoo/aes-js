@@ -641,6 +641,12 @@
     if (typeof exports !== 'undefined') {
         module.exports = aesjs
 
+    // RequireJS/AMD
+    // http://www.requirejs.org/docs/api.html
+    // https://github.com/amdjs/amdjs-api/wiki/AMD
+    } else if (typeof(define) === 'function' && define.amd) {
+        define(aesjs);
+
     // Web Browsers
     } else {
 
