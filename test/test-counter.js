@@ -14,6 +14,12 @@ function makeTest (options) {
     return function(test) {
         var result = new Buffer(options.incrementResult, 'hex');
 
+        if (options.hasOwnProperty('nullish')) {
+            var counter = new aes.Counter(options.nullish);
+            counter.increment();
+            test.ok(bufferEquals(counter._counter, result), "counter failed to initialize with a nullish thing")
+        }
+
         if (options.hasOwnProperty('number')) {
 
             var counter = new aes.Counter(options.number);
@@ -52,6 +58,10 @@ function makeTest (options) {
 }
 
 var Tests = {
+    'test-counter-nullish': {
+        'test-null': makeTest({nullish: null, incrementResult: "00000000000000000000000000000002"}),
+        'test-undefined': makeTest({nullish: undefined, incrementResult: "00000000000000000000000000000002"}),
+    },
     'test-counter-number': {
         'test-0': makeTest({number: 0, incrementResult: "00000000000000000000000000000001"}),
         'test-1': makeTest({number: 1, incrementResult: "00000000000000000000000000000002"}),

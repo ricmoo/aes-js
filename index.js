@@ -386,8 +386,9 @@
         this.description = "Cipher Block Chaining";
         this.name = "cbc";
 
-        if (iv === null) {
+        if (!iv) {
             iv = createBuffer([0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+
         } else if (iv.length != 16) {
             return new Error('initialation vector iv must be of length 16');
         }
@@ -435,8 +436,9 @@
         this.description = "Cipher Feedback";
         this.name = "cfb";
 
-        if (iv === null) {
+        if (!iv) {
             iv = createBuffer([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+
         } else if (iv.length != 16) {
             return new Error('initialation vector iv must be of length 16');
         }
@@ -502,8 +504,9 @@
         this.description = "Output Feedback";
         this.name = "ofb";
 
-        if (iv === null) {
+        if (!iv) {
             iv = createBuffer([0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+
         } else if (iv.length != 16) {
             return new Error('initialation vector iv must be of length 16');
         }
@@ -536,7 +539,8 @@
      *  Counter object for CTR common mode of operation
      */
     var Counter = function(initialValue) {
-        if (initialValue === null || initialValue === undefined) { initialValue = 1; }
+        // We allow 0, but anything false-ish uses the default 1
+        if (initialValue !== 0 && !initialValue) { initialValue = 1; }
 
         if (typeof(initialValue) === 'number') {
             this._counter = createBuffer([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -548,8 +552,8 @@
     }
 
     Counter.prototype.setValue = function(value) {
-        if (typeof(value) !== 'number') {
-            throw new Error('value must be a number');
+        if (typeof(value) !== 'number' || parseInt(value) != value) {
+            throw new Error('value must be an integer');
         }
 
         for (var index = 15; index >= 0; --index) {
@@ -584,8 +588,8 @@
         this.description = "Counter";
         this.name = "ctr";
 
-        if (counter === null) {
-            counter = new Counter()
+        if (!(counter instanceof Counter)) {
+            counter = new Counter(counter)
         }
 
         this._counter = counter;
