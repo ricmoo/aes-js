@@ -1,8 +1,6 @@
 "use strict";
 
-(function() {
-    var root = this;
-    var previous_mymodule = root.mymodule;
+(function(root) {
 
     var createBuffer = null, convertBytesToString, convertStringToBytes = null;
 
@@ -623,7 +621,7 @@
 
 
     ///////////////////////
-    // Exports
+    // Exporting
 
 
     // The block cipher
@@ -639,26 +637,20 @@
     };
 
 
+    // node.js
+    if (typeof exports !== 'undefined') {
+        module.exports = aesjs
 
-    if(typeof exports !== 'undefined') {
-        exports.AES = AES;
-        exports.Counter = Counter;
-        exports.ModeOfOperation = ModeOfOperation;
-        exports.util = {
-            convertBytesToString: convertBytesToString,
-            convertStringToBytes: convertStringToBytes,
-            _slowCreateBuffer: slowCreateBuffer
-        }
-        /*
-        if(typeof module !== 'undefined' && module.exports) {
-            exports = module.exports = export;
-        }
-        exports.mymodule = mymodule;
-        */
-
+    // Web Browsers
     } else {
+
+        // If there was an existing library at "aes" make sure it's still available
+        if (root.aes) {
+            aesjs._aes = root.aes;
+        }
+
         root.aesjs = aesjs;
     }
 
 
-}).call(this);
+})(this);
