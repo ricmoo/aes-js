@@ -2,7 +2,7 @@
 
 (function(root) {
 
-    var createBuffer = null, convertBytesToString, convertStringToBytes = null;
+    var createBuffer = null, copyBuffer = null, convertBytesToString, convertStringToBytes = null;
 
     var slowCreateBuffer = function(arg) {
 
@@ -39,12 +39,12 @@
     if (typeof(Buffer) === 'undefined') {
         createBuffer = slowCreateBuffer;
 
-        Array.prototype.copy = function(targetArray, targetStart, sourceStart, sourceEnd) {
+        copyBuffer = function(sourceBuffer, targetBuffer, targetStart, sourceStart, sourceEnd) {
             if (targetStart == null) { targetStart = 0; }
             if (sourceStart == null) { sourceStart = 0; }
-            if (sourceEnd == null) { sourceEnd = this.length; }
+            if (sourceEnd == null) { sourceEnd = sourceBuffer.length; }
             for (var i = sourceStart; i < sourceEnd; i++) {
-                targetArray[targetStart++] = this[i];
+                targetBuffer[targetStart++] = sourceBuffer[i];
             }
         }
 
@@ -125,6 +125,11 @@
 
     } else {
         createBuffer = function(arg) { return new Buffer(arg); }
+
+        copyBuffer = function(sourceBuffer, targetBuffer, targetStart, sourceStart, sourceEnd) {
+            sourceBuffer.copy(targetBuffer, targetStart, sourceStart, sourceEnd);
+        }
+
         convertStringToBytes = function(text, encoding) {
             return new Buffer(text, encoding);
         }
@@ -417,7 +422,7 @@
             plaintext[i] ^= this._lastCipherblock[i];
         }
 
-        ciphertext.copy(this._lastCipherblock);
+        copyBuffer(ciphertext, this._lastCipherblock);
 
         return plaintext;
     }
@@ -460,8 +465,8 @@
             }
 
             // Shift the register
-            this._shiftRegister.copy(this._shiftRegister, 0, this.segmentSize);
-            encrypted.copy(this._shiftRegister, 16 - this.segmentSize, i, i + this.segmentSize);
+            copyBuffer(this._shiftRegister, this._shiftRegister, 0, this.segmentSize);
+            copyBuffer(encrypted, this._shiftRegister, 16 - this.segmentSize, i, i + this.segmentSize);
         }
 
         return encrypted;
@@ -483,8 +488,8 @@
             }
 
             // Shift the register
-            this._shiftRegister.copy(this._shiftRegister, 0, this.segmentSize);
-            ciphertext.copy(this._shiftRegister, 16 - this.segmentSize, i, i + this.segmentSize);
+            copyBuffer(this._shiftRegister, this._shiftRegister, 0, this.segmentSize);
+            copyBuffer(ciphertext, this._shiftRegister, 16 - this.segmentSize, i, i + this.segmentSize);
         }
 
         return plaintext;
