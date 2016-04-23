@@ -36,7 +36,7 @@ var aesjs = require('aes-js');
 To use `aes-js` in a web page, add the following:
 
 ```html
-<script type="text/javascript" src="https://raw.githubusercontent.com/ricmoo/aes-js/master/index.js"></script>
+<script type="text/javascript" src="https://rawgit.com/ricmoo/aes-js/master/index.js"></script>
 ```
 
 Keys
