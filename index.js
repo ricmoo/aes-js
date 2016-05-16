@@ -18,7 +18,7 @@
             // Make sure they are passing sensible data
             for (var i = 0; i < arg.length; i++) {
                 if (arg[i] < 0 || arg[i] >= 256 || typeof arg[i] !== 'number') {
-                    throw new Error('invalid byte at index ' + i + '(' + arg[i] + ')');
+                    throw new Error('invalid byte (' + arg[i] + ':' + i + ')');
                 }
             }
 
@@ -186,6 +186,10 @@
 
 
     var AES = function(key) {
+        if (!(this instanceof AES)) {
+            throw Error('AES must be instanitated with `new`');
+        }
+
         this.key = createBuffer(key);
         this._prepare();
     }
@@ -195,7 +199,7 @@
 
         var rounds = numberOfRounds[this.key.length];
         if (rounds == null) {
-            throw new Error('invalid key size (must be length 16, 24 or 32)');
+            throw new Error('invalid key size (must be 16, 24 or 32 bytes)');
         }
 
         // encryption round keys
@@ -283,7 +287,7 @@
 
     AES.prototype.encrypt = function(plaintext) {
         if (plaintext.length != 16) {
-            return new Error('plaintext must be a block of size 16');
+            throw new Error('invalid plaintext size (must be 16 bytes)');
         }
 
         var rounds = this._Ke.length - 1;
@@ -322,7 +326,7 @@
 
     AES.prototype.decrypt = function(ciphertext) {
         if (ciphertext.length != 16) {
-            return new Error('ciphertext must be a block of size 16');
+            throw new Error('invalid ciphertext size (must be 16 bytes)');
         }
 
         var rounds = this._Kd.length - 1;
@@ -364,6 +368,10 @@
      *  Mode Of Operation - Electonic Codebook (ECB)
      */
     var ModeOfOperationECB = function(key) {
+        if (!(this instanceof ModeOfOperationECB)) {
+            throw Error('AES must be instanitated with `new`');
+        }
+
         this.description = "Electronic Code Block";
         this.name = "ecb";
 
@@ -383,14 +391,18 @@
      *  Mode Of Operation - Cipher Block Chaining (CBC)
      */
     var ModeOfOperationCBC = function(key, iv) {
+        if (!(this instanceof ModeOfOperationCBC)) {
+            throw Error('AES must be instanitated with `new`');
+        }
+
         this.description = "Cipher Block Chaining";
         this.name = "cbc";
 
         if (!iv) {
-            iv = createBuffer([0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+            iv = createBuffer([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
         } else if (iv.length != 16) {
-            return new Error('initialation vector iv must be of length 16');
+            throw new Error('invalid initialation vector size (must be 16 bytes)');
         }
 
         this._lastCipherblock = createBuffer(iv);
@@ -400,7 +412,7 @@
 
     ModeOfOperationCBC.prototype.encrypt = function(plaintext) {
         if (plaintext.length != 16) {
-            return new Error('plaintext must be a block of size 16');
+            throw new Error('invalid plaintext size (must be 16 bytes)');
         }
 
         var precipherblock = createBuffer(plaintext);
@@ -415,7 +427,7 @@
 
     ModeOfOperationCBC.prototype.decrypt = function(ciphertext) {
         if (ciphertext.length != 16) {
-            return new Error('ciphertext must be a block of size 16');
+            throw new Error('invalid ciphertext size (must be 16 bytes)');
         }
 
         var plaintext = this._aes.decrypt(ciphertext);
@@ -433,6 +445,10 @@
      *  Mode Of Operation - Cipher Feedback (CFB)
      */
     var ModeOfOperationCFB = function(key, iv, segmentSize) {
+        if (!(this instanceof ModeOfOperationCFB)) {
+            throw Error('AES must be instanitated with `new`');
+        }
+
         this.description = "Cipher Feedback";
         this.name = "cfb";
 
@@ -440,7 +456,7 @@
             iv = createBuffer([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
         } else if (iv.length != 16) {
-            return new Error('initialation vector iv must be of length 16');
+            throw new Error('invalid initialation vector size (must be 16 size)');
         }
 
         if (!segmentSize) { segmentSize = 1; }
@@ -454,7 +470,7 @@
 
     ModeOfOperationCFB.prototype.encrypt = function(plaintext) {
         if ((plaintext.length % this.segmentSize) != 0) {
-            return new Error('plaintext must be a block of size module segmentSize (' + this.segmentSize + ')');
+            throw new Error('invalid plaintext size (must be segmentSize bytes)');
         }
 
         var encrypted = createBuffer(plaintext);
@@ -476,7 +492,7 @@
 
     ModeOfOperationCFB.prototype.decrypt = function(ciphertext) {
         if ((ciphertext.length % this.segmentSize) != 0) {
-            return new Error('ciphertext must be a block of size module segmentSize (' + this.segmentSize + ')');
+            throw new Error('invalid ciphertext size (must be segmentSize bytes)');
         }
 
         var plaintext = createBuffer(ciphertext);
@@ -501,6 +517,10 @@
      *  Mode Of Operation - Output Feedback (OFB)
      */
     var ModeOfOperationOFB = function(key, iv) {
+        if (!(this instanceof ModeOfOperationOFB)) {
+            throw Error('AES must be instanitated with `new`');
+        }
+
         this.description = "Output Feedback";
         this.name = "ofb";
 
@@ -508,7 +528,7 @@
             iv = createBuffer([0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
         } else if (iv.length != 16) {
-            return new Error('initialation vector iv must be of length 16');
+            throw new Error('invalid initialation vector size (must be 16 bytes)');
         }
 
         this._lastPrecipher = createBuffer(iv);
@@ -539,6 +559,10 @@
      *  Counter object for CTR common mode of operation
      */
     var Counter = function(initialValue) {
+        if (!(this instanceof Counter)) {
+            throw Error('Counter must be instanitated with `new`');
+        }
+
         // We allow 0, but anything false-ish uses the default 1
         if (initialValue !== 0 && !initialValue) { initialValue = 1; }
 
@@ -553,7 +577,7 @@
 
     Counter.prototype.setValue = function(value) {
         if (typeof(value) !== 'number' || parseInt(value) != value) {
-            throw new Error('value must be an integer');
+            throw new Error('invalid counter value (must be an integer)');
         }
 
         for (var index = 15; index >= 0; --index) {
@@ -564,7 +588,7 @@
 
     Counter.prototype.setBytes = function(bytes) {
         if (bytes.length != 16) {
-            throw new Error('invalid counter bytes size (must be 16)');
+            throw new Error('invalid counter bytes size (must be 16 bytes)');
         }
         this._counter = createBuffer(bytes);
     };
@@ -585,6 +609,10 @@
      *  Mode Of Operation - Counter (CTR)
      */
     var ModeOfOperationCTR = function(key, counter) {
+        if (!(this instanceof ModeOfOperationCTR)) {
+            throw Error('AES must be instanitated with `new`');
+        }
+
         this.description = "Counter";
         this.name = "ctr";
 
