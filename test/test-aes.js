@@ -72,12 +72,12 @@ function makeTest(options) {
 var testVectors = require('./test-vectors.json');
 
 var Tests = {};
-
+var counts = {}
 for (var i = 0; i < testVectors.length; i++) {
     var test = testVectors[i];
-    name = 'test-' + test.modeOfOperation + '-' + test.key.length;
-    if (!Tests[name]) { Tests[name] = {}; }
-    Tests[name]['test-' + Object.keys(Tests[name]).length] = makeTest(test);
+    name = test.modeOfOperation + '-' + test.key.length;
+    counts[name] = (counts[name] || 0) + 1;
+    Tests['test-' + name + '-' + counts[name]] = makeTest(test);
 }
 
-nodeunit.reporters.default.run(Tests);
+module.exports = Tests;

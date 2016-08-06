@@ -57,33 +57,17 @@ function makeTest (options) {
     };
 }
 
-var Tests = {
-    'test-counter-nullish': {
-        'test-null': makeTest({nullish: null, incrementResult: "00000000000000000000000000000002"}),
-        'test-undefined': makeTest({nullish: undefined, incrementResult: "00000000000000000000000000000002"}),
-    },
-    'test-counter-number': {
-        'test-0': makeTest({number: 0, incrementResult: "00000000000000000000000000000001"}),
-        'test-1': makeTest({number: 1, incrementResult: "00000000000000000000000000000002"}),
-        'test-254': makeTest({number: 254, incrementResult: "000000000000000000000000000000ff"}),
-        'test-255': makeTest({number: 255, incrementResult: "00000000000000000000000000000100"}),
-        'test-256': makeTest({number: 256, incrementResult: "00000000000000000000000000000101"}),
-    },
-    'test-counter-bytes': {
-        'test-0000': makeTest({bytes: "00000000000000000000000000000000", incrementResult: "00000000000000000000000000000001"}),
-        'test-00ff': makeTest({bytes: "000000000000000000000000000000ff", incrementResult: "00000000000000000000000000000100"}),
-        'test-ffff': makeTest({bytes: "ffffffffffffffffffffffffffffffff", incrementResult: "00000000000000000000000000000000"}),
-        'test-dead': makeTest({bytes: "deadbeefdeadbeefdeadbeefdeadbeef", incrementResult: "deadbeefdeadbeefdeadbeefdeadbef0"}),
-    },
+module.exports = {
+    'test-counter-nullish-null': makeTest({nullish: null, incrementResult: "00000000000000000000000000000002"}),
+    'test-counter-nullish-undefined': makeTest({nullish: undefined, incrementResult: "00000000000000000000000000000002"}),
+    'test-counter-number-0': makeTest({number: 0, incrementResult: "00000000000000000000000000000001"}),
+    'test-counter-number-1': makeTest({number: 1, incrementResult: "00000000000000000000000000000002"}),
+    'test-counter-number-254': makeTest({number: 254, incrementResult: "000000000000000000000000000000ff"}),
+    'test-counter-number-255': makeTest({number: 255, incrementResult: "00000000000000000000000000000100"}),
+    'test-counter-number-256': makeTest({number: 256, incrementResult: "00000000000000000000000000000101"}),
+    'test-counter-bytes-0000': makeTest({bytes: "00000000000000000000000000000000", incrementResult: "00000000000000000000000000000001"}),
+    'test-counter-bytes-00ff': makeTest({bytes: "000000000000000000000000000000ff", incrementResult: "00000000000000000000000000000100"}),
+    'test-counter-bytes-ffff': makeTest({bytes: "ffffffffffffffffffffffffffffffff", incrementResult: "00000000000000000000000000000000"}),
+    'test-counter-bytes-dead': makeTest({bytes: "deadbeefdeadbeefdeadbeefdeadbeef", incrementResult: "deadbeefdeadbeefdeadbeefdeadbef0"}),
 };
-
-/*
-for (var i = 0; i < testVectors.length; i++) {
-    var test = testVectors[i];
-    name = 'test-' + test.modeOfOperation + '-' + test.key.length;
-    if (!Tests[name]) { Tests[name] = {}; }
-    Tests[name]['test-' + Object.keys(Tests[name]).length] = makeTest(test);
-}
-*/
-nodeunit.reporters.default.run(Tests);
 

@@ -59,7 +59,12 @@ for mode in [ 'CBC', 'CTR',  'CFB', 'ECB', 'OFB' ]:
 
             if mode == 'CBC':
                 iv = os.urandom(16)
-                plaintext = [ os.urandom(16) for x in xrange(0, test) ]
+
+                text_length = [None, 16, 16, 16, 32, 48, 64, 64, 64][test]
+                if test == 1:
+                    plaintext = [ '' ]
+                else:
+                    plaintext = [ os.urandom(text_length) for x in xrange(0, test) ]
 
                 kaes = KAES.new(key, KAES.MODE_CBC, IV = iv)
                 kaes2 = KAES.new(key, KAES.MODE_CBC, IV = iv)
@@ -74,7 +79,11 @@ for mode in [ 'CBC', 'CTR',  'CFB', 'ECB', 'OFB' ]:
                 segment_size = test
 
             elif mode == 'ECB':
-                plaintext = [ os.urandom(16) for x in xrange(0, test) ]
+                text_length = [None, 16, 16, 16, 32, 48, 64, 64, 64][test]
+                if test == 1:
+                    plaintext = [ '' ]
+                else:
+                    plaintext = [ os.urandom(text_length) for x in xrange(0, test) ]
 
                 kaes = KAES.new(key, KAES.MODE_ECB)
                 kaes2 = KAES.new(key, KAES.MODE_ECB)

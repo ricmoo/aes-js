@@ -27,20 +27,18 @@ function buffersEqual(a, b) {
     return true;
 }
 
-nodeunit.reporters.default.run({
-    "test-buffer": {
-        "slowCreate": function(test) {
-            //var result = new AES(testArray).key;
-            var result = slowCreateBuffer(testArray);
-            test.ok(buffersEqual(testArray, result), 'bufferCreate failed to match input array');
+module.exports = {
+    "test-slowCreate": function(test) {
+        //var result = new AES(testArray).key;
+        var result = slowCreateBuffer(testArray);
+        test.ok(buffersEqual(testArray, result), 'bufferCreate failed to match input array');
 
-            result = slowCreateBuffer(testBuffer);
-            test.ok(buffersEqual(testBuffer, result), 'bufferCreate failed to match input array');
+        result = slowCreateBuffer(testBuffer);
+        test.ok(buffersEqual(testBuffer, result), 'bufferCreate failed to match input array');
 
-            result = slowCreateBuffer(new WeirdBuffer(testArray));
-            test.ok(buffersEqual(testBuffer, result), 'bufferCreate failed to match input array');
+        result = slowCreateBuffer(new WeirdBuffer(testArray));
+        test.ok(buffersEqual(testBuffer, result), 'bufferCreate failed to match input array');
 
-            test.done();
-        },
+        test.done();
     },
-});
+};

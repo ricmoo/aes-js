@@ -379,11 +379,37 @@
     }
 
     ModeOfOperationECB.prototype.encrypt = function(plaintext) {
-        return this._aes.encrypt(plaintext);
+        if ((plaintext.length % 16) !== 0) {
+            throw new Error('invalid plaintext size (must be multiple of 16 bytes)');
+        }
+
+        var ciphertext = createBuffer(plaintext.length);
+        var block = createBuffer(16);
+
+        for (var i = 0; i < plaintext.length; i += 16) {
+            copyBuffer(plaintext, block, 0, i, i + 16);
+            block = this._aes.encrypt(block);
+            copyBuffer(block, ciphertext, i, 0, 16);
+        }
+
+        return ciphertext;
     }
 
-    ModeOfOperationECB.prototype.decrypt = function(ciphertext, encoding) {
-        return this._aes.decrypt(ciphertext);
+    ModeOfOperationECB.prototype.decrypt = function(ciphertext) {
+        if ((ciphertext.length % 16) !== 0) {
+            throw new Error('invalid ciphertext size (must be multiple of 16 bytes)');
+        }
+
+        var plaintext = createBuffer(ciphertext.length);
+        var block = createBuffer(16);
+
+        for (var i = 0; i < ciphertext.length; i += 16) {
+            copyBuffer(ciphertext, block, 0, i, i + 16);
+            block = this._aes.decrypt(block);
+            copyBuffer(block, plaintext, i, 0, 16);
+        }
+
+        return plaintext;
     }
 
 
@@ -411,31 +437,45 @@
     }
 
     ModeOfOperationCBC.prototype.encrypt = function(plaintext) {
-        if (plaintext.length != 16) {
-            throw new Error('invalid plaintext size (must be 16 bytes)');
+        if ((plaintext.length % 16) !== 0) {
+            throw new Error('invalid plaintext size (must be multiple of 16 bytes)');
         }
 
-        var precipherblock = createBuffer(plaintext);
-        for (var i = 0; i < 16; i++) {
-            precipherblock[i] ^= this._lastCipherblock[i];
+        var ciphertext = createBuffer(plaintext.length);
+        var block = createBuffer(16);
+
+        for (var i = 0; i < plaintext.length; i += 16) {
+            copyBuffer(plaintext, block, 0, i, i + 16);
+
+            for (var j = 0; j < 16; j++) {
+                block[j] ^= this._lastCipherblock[j];
+            }
+
+            this._lastCipherblock = this._aes.encrypt(block);
+            copyBuffer(this._lastCipherblock, ciphertext, i, 0, 16);
         }
 
-        this._lastCipherblock = this._aes.encrypt(precipherblock);
-
-        return this._lastCipherblock;
+        return ciphertext;
     }
 
     ModeOfOperationCBC.prototype.decrypt = function(ciphertext) {
-        if (ciphertext.length != 16) {
-            throw new Error('invalid ciphertext size (must be 16 bytes)');
+        if ((ciphertext.length % 16) !== 0) {
+            throw new Error('invalid ciphertext size (must be multiple of 16 bytes)');
         }
 
-        var plaintext = this._aes.decrypt(ciphertext);
-        for (var i = 0; i < 16; i++) {
-            plaintext[i] ^= this._lastCipherblock[i];
-        }
+        var plaintext = createBuffer(ciphertext.length);
+        var block = createBuffer(16);
 
-        copyBuffer(ciphertext, this._lastCipherblock);
+        for (var i = 0; i < ciphertext.length; i += 16) {
+            copyBuffer(ciphertext, block, 0, i, i + 16);
+            block = this._aes.decrypt(block);
+
+            for (var j = 0; j < 16; j++) {
+                plaintext[i + j] = block[j] ^ this._lastCipherblock[j];
+            }
+
+            copyBuffer(ciphertext, this._lastCipherblock, 0, i, i + 16);
+        }
 
         return plaintext;
     }
@@ -647,7 +687,7 @@
     ModeOfOperationCTR.prototype.decrypt = ModeOfOperationCTR.prototype.encrypt;
 
 
-    // The bsic modes of operation as a map
+    // The basic modes of operation as a map
     var ModeOfOperation = {
         ecb: ModeOfOperationECB,
         cbc: ModeOfOperationCBC,
