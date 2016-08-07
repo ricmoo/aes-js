@@ -79,7 +79,7 @@ module.exports = {
         for (var i = 0; i < 3; i++) {
             var key = newBuffer(16 + i * 8);
             for (var j = 0; j < textSizes.length; j++) {
-                for (var k = 0; k < 1; k++) {  // @TODO: add CBC
+                for (var k = 0; k < 2; k++) {
                     var text = newBuffer(textSizes[j]);
                     if (k === 0) {
                         var moo = new aes.ModeOfOperation.ecb(key);
@@ -100,15 +100,21 @@ module.exports = {
         for (var i = 0; i < 3; i++) {
             var key = newBuffer(16 + i * 8);
             for (var j = 0; j < textSizes.length; j++) {
-                var text = newBuffer(textSizes[j]);
-                var moo = new aes.ModeOfOperation.ecb(key);
+                for (var k = 0; k < 2; k++) {
+                    var text = newBuffer(textSizes[j]);
+                    if (k === 0) {
+                        var moo = new aes.ModeOfOperation.ecb(key);
+                    } else {
+                        var moo = new aes.ModeOfOperation.cbc(key, newBuffer(16));
+                    }
 
-                test.throws(function() {
-                    moo.decrypt(text);
-                }, function(error) {
-                    return (error.message === 'invalid ciphertext size (must be multiple of 16 bytes)');
-                },
-                'invalid text size failed to throw an error');
+                    test.throws(function() {
+                        moo.decrypt(text);
+                    }, function(error) {
+                        return (error.message === 'invalid ciphertext size (must be multiple of 16 bytes)');
+                    },
+                    'invalid text size failed to throw an error');
+                }
             }
         }
 
