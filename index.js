@@ -698,6 +698,40 @@
 
 
     ///////////////////////
+    // Padding
+
+    // See:https://tools.ietf.org/html/rfc2315
+    function pkcs7pad(data) {
+        data = createBuffer(data);
+        var padder = 16 - (data.length % 16);
+        var result = createBuffer(data.length + padder);
+        copyBuffer(data, result);
+        for (var i = data.length; i < result.length; i++) {
+            result[i] = padder;
+        }
+        return result;
+    }
+
+    function pkcs7strip(data) {
+        data = createBuffer(data);
+        if (data.length < 16) { throw new Error('PKCS#7 invalid length'); }
+
+        var padder = data[data.length - 1];
+        if (padder > 16) { throw new Error('PKCS#7 padding byte out of range'); }
+
+        var length = data.length - padder;
+        for (var i = 0; i < padder; i++) {
+            if (data[length + i] !== padder) {
+                throw new Error('PKCS#7 invalid padding byte');
+            }
+        }
+
+        var result = createBuffer(length);
+        copyBuffer(data, result, 0, 0, length);
+        return result;
+    }
+
+    ///////////////////////
     // Exporting
 
 
@@ -706,6 +740,12 @@
         AES: AES,
         Counter: Counter,
         ModeOfOperation: ModeOfOperation,
+        padding: {
+            pkcs7: {
+                pad: pkcs7pad,
+                strip: pkcs7strip
+            }
+        },
         util: {
             convertBytesToString: convertBytesToString,
             convertStringToBytes: convertStringToBytes,
