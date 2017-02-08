@@ -169,7 +169,7 @@ module.exports = {
             test.throws(function() {
                 counter.setBytes(badThings[i]);
             }, function(error) {
-                return (error.message === 'invalid counter bytes size (must be 16 bytes)');
+                return (error.message === 'unsupported array-like object');
             },
             'invalid counter setBytes (numbers) failed to throw an error');
         }
@@ -180,7 +180,7 @@ module.exports = {
             test.throws(function() {
                 counter.setBytes(badThings[i]);
             }, function(error) {
-                return (error.message === 'invalid counter bytes size (must be 16 bytes)');
+                return (error.message === 'unsupported array-like object');
             },
             'invalid counter setBytes (' + badThings[i] + ') failed to throw an error');
 
