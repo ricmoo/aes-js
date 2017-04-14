@@ -633,8 +633,9 @@
         }
 
         for (var index = 15; index >= 0; --index) {
-            this._counter[index] = value % 256;
-            value = value >> 8;
+            var byte = value & 0xff;
+            this._counter[index] = byte;
+            value = (value-byte) / 256;
         }
     }
 
