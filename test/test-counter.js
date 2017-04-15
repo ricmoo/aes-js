@@ -65,6 +65,8 @@ module.exports = {
     'test-counter-number-254': makeTest({number: 254, incrementResult: "000000000000000000000000000000ff"}),
     'test-counter-number-255': makeTest({number: 255, incrementResult: "00000000000000000000000000000100"}),
     'test-counter-number-256': makeTest({number: 256, incrementResult: "00000000000000000000000000000101"}),
+    'test-counter-number-large': makeTest({number: 1099511627774, incrementResult: "0000000000000000000000ffffffffff"}),
+    'test-counter-number-max': makeTest({number: 9007199254740991, incrementResult: "00000000000000000020000000000000"}),
     'test-counter-bytes-0000': makeTest({bytes: "00000000000000000000000000000000", incrementResult: "00000000000000000000000000000001"}),
     'test-counter-bytes-00ff': makeTest({bytes: "000000000000000000000000000000ff", incrementResult: "00000000000000000000000000000100"}),
     'test-counter-bytes-ffff': makeTest({bytes: "ffffffffffffffffffffffffffffffff", incrementResult: "00000000000000000000000000000000"}),

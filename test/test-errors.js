@@ -163,6 +163,13 @@ module.exports = {
         },
         'invalid counter setValue (non-integer number) failed to throw an error');
 
+        test.throws(function() {
+            var counter = new aes.Counter(Number.MAX_SAFE_INTEGER + 1);
+        }, function(error) {
+            return (error.message === 'integer value out of safe range');
+        },
+        'invalid counter value (out of range) failed to throw an error');
+
         var badThings = [0, 1.5, 1];
         for (var i = 0; i < badThings.length; i++) {
             var counter = new aes.Counter();

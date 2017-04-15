@@ -632,9 +632,14 @@
             throw new Error('invalid counter value (must be an integer)');
         }
 
+        // We cannot safely handle numbers beyond the safe range for integers
+        if (value > Number.MAX_SAFE_INTEGER) {
+            throw new Error('integer value out of safe range');
+        }
+
         for (var index = 15; index >= 0; --index) {
             this._counter[index] = value % 256;
-            value = value >> 8;
+            value = parseInt(value / 256);
         }
     }
 
