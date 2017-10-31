@@ -103,12 +103,12 @@ var key_256 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 // or, you may use Uint8Array:
 var key_128_array = new Uint8Array(key_128);
 var key_192_array = new Uint8Array(key_192);
-var key_258_array = new Uint8Array(key_256);
+var key_256_array = new Uint8Array(key_256);
 
 // or, you may use Buffer in node.js:
 var key_128_buffer = new Buffer(key_128);
 var key_192_buffer = new Buffer(key_192);
-var key_258_buffer = new Buffer(key_256);
+var key_256_buffer = new Buffer(key_256);
 ```
 
 
