@@ -1,6 +1,5 @@
-"use strict";
-
 (function(root) {
+    "use strict";
 
     function checkInt(value) {
         return (parseInt(value) === value);
