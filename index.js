@@ -444,11 +444,18 @@
         this._aes = new AES(key);
     }
 
-    ModeOfOperationCBC.prototype.encrypt = function(plaintext) {
+    ModeOfOperationCBC.prototype.encrypt = function(plaintext, customIV) {
         plaintext = coerceArray(plaintext);
 
         if ((plaintext.length % 16) !== 0) {
             throw new Error('invalid plaintext size (must be multiple of 16 bytes)');
+        }
+
+        if (typeof customIV !== 'undefined') {
+            if (customIV.length != 16) {
+                throw new Error('invalid initialation vector size (must be 16 bytes)');
+            }
+            this._lastCipherblock = coerceArray(customIV, true);
         }
 
         var ciphertext = createArray(plaintext.length);
