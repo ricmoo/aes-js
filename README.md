@@ -130,7 +130,7 @@ var key = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ];
 var text = 'Text may be any length you wish, no padding is required.';
 var textBytes = aesjs.utils.utf8.toBytes(text);
 
-// The counter is optional, and if omitted will begin at 1
+// The counter is optional, and if omitted will generate random IV.
 var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
 var encryptedBytes = aesCtr.encrypt(textBytes);
 
@@ -198,7 +198,7 @@ console.log(decryptedText);
 var key = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ];
 
 // The initialization vector (must be 16 bytes)
-var iv = [ 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,35, 36 ];
+var iv = [ 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36 ];
 
 // Convert text to bytes (must be a multiple of the segment size you choose below)
 var text = 'TextMustBeAMultipleOfSegmentSize';
@@ -370,6 +370,35 @@ var key_256 = pbkdf2.pbkdf2Sync('password', 'salt', 1, 256 / 8, 'sha512');
 ```
 
 Another possibility, is to use a hashing function, such as SHA256 to hash the password, but this method is vulnerable to [Rainbow Attacks](http://en.wikipedia.org/wiki/Rainbow_table), unless you use a [salt](http://en.wikipedia.org/wiki/Salt_(cryptography)).
+
+
+Initialization Vectors 
+-----------
+
+Each of the block cipher modes supported above rely upon an initialization vector for the security of the encryption scheme. If an initialization vector is not provided, one will be randomly generated (taking advantage of cryptographically secure random generators when possible). It does not need to be kept secret, it merely needs to be unique and random. 
+
+It is common practice to place the IV at the start of the payload, in plain text. 
+
+You will be able to retrieve the initialization vector by calling a function.
+
+Example:
+
+```javascript
+// Creates the cipher in CTR mode
+var ctr = new aesjs.ModeOfOperation.ctr(key);
+
+// Retrieves the initialization vector.
+var iv = ctr.iv();
+
+// . . . 
+// Some other code executing at some other time
+
+// Creates the cipher in CTR mode to decrypt with.
+var ctr = new aesjs.ModeOfOperation.ctr(key, iv);
+``` 
+
+The retrieval function is supported for each of the cipher modes.
+
 
 Performance
 -----------

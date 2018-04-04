@@ -12,12 +12,18 @@ function bufferEquals(a, b) {
 
 function makeTest (options) {
     return function(test) {
-        var result = new Buffer(options.incrementResult, 'hex');
+        var result;
+        if(options.incrementResult)
+        {
+            result = new Buffer(options.incrementResult, 'hex');
+        }
 
         if (options.hasOwnProperty('nullish')) {
             var counter = new aes.Counter(options.nullish);
+            var counter2 = new aes.Counter(counter.iv());
             counter.increment();
-            test.ok(bufferEquals(counter._counter, result), "counter failed to initialize with a nullish thing")
+            counter2.increment();
+            test.ok(bufferEquals(counter._counter, counter2._counter), "counter failed to initialize with a nullish thing")
         }
 
         if (options.hasOwnProperty('number')) {
@@ -58,8 +64,6 @@ function makeTest (options) {
 }
 
 module.exports = {
-    'test-counter-nullish-null': makeTest({nullish: null, incrementResult: "00000000000000000000000000000002"}),
-    'test-counter-nullish-undefined': makeTest({nullish: undefined, incrementResult: "00000000000000000000000000000002"}),
     'test-counter-number-0': makeTest({number: 0, incrementResult: "00000000000000000000000000000001"}),
     'test-counter-number-1': makeTest({number: 1, incrementResult: "00000000000000000000000000000002"}),
     'test-counter-number-254': makeTest({number: 254, incrementResult: "000000000000000000000000000000ff"}),
@@ -71,5 +75,7 @@ module.exports = {
     'test-counter-bytes-00ff': makeTest({bytes: "000000000000000000000000000000ff", incrementResult: "00000000000000000000000000000100"}),
     'test-counter-bytes-ffff': makeTest({bytes: "ffffffffffffffffffffffffffffffff", incrementResult: "00000000000000000000000000000000"}),
     'test-counter-bytes-dead': makeTest({bytes: "deadbeefdeadbeefdeadbeefdeadbeef", incrementResult: "deadbeefdeadbeefdeadbeefdeadbef0"}),
+    'test-counter-nullish-null': makeTest({nullish: null}),
+    'test-counter-nullish-undefined': makeTest({nullish: undefined}),
 };
 
