@@ -55,6 +55,35 @@
         return new Uint8Array(length);
     }
 
+    function createRandomArray(length)
+    {
+        // Todo: Node.js crypto randomness.
+        var arr = createArray(length);
+
+        // For Modern Web Browsers
+        if(typeof(window) !== "undefined" && typeof(window.crypto) !== "undefined")
+        {
+            window.crypto.getRandomValues(arr);
+        }
+        // For Node.js Processes
+        else if((typeof process !== 'undefined') && (process.release.name.search(/node|io.js/) !== -1))
+        {
+            const crypto = require('crypto')
+            crypto.randomFillSync(arr);
+        }
+        else
+        {
+            // Warning: Not Secure for certain types of Cipher Modes. 
+            // CTR is fine with this.
+            for(var i = 0; i < arr.length; i++)
+            {
+                arr[i] = Math.floor(Math.random() * 256);
+            }
+        }
+        
+        return arr;
+    }
+
     function copyArray(sourceArray, targetArray, targetStart, sourceStart, sourceEnd) {
         if (sourceStart != null || sourceEnd != null) {
             if (sourceArray.slice) {
@@ -382,6 +411,11 @@
         this._aes = new AES(key);
     }
 
+    ModeOfOperationECB.prototype.iv = function()
+    {
+        return null;
+    }
+
     ModeOfOperationECB.prototype.encrypt = function(plaintext) {
         plaintext = coerceArray(plaintext);
 
@@ -433,15 +467,20 @@
         this.name = "cbc";
 
         if (!iv) {
-            iv = createArray(16);
-
+            iv = createRandomArray(16);
         } else if (iv.length != 16) {
             throw new Error('invalid initialation vector size (must be 16 bytes)');
         }
 
-        this._lastCipherblock = coerceArray(iv, true);
 
+        this._lastCipherblock = coerceArray(iv, true);
+        this._iv = this._lastCipherblock.slice(0);
         this._aes = new AES(key);
+    }
+
+    ModeOfOperationCBC.prototype.iv = function()
+    {
+        return this._iv;
     }
 
     ModeOfOperationCBC.prototype.encrypt = function(plaintext) {
@@ -505,8 +544,7 @@
         this.name = "cfb";
 
         if (!iv) {
-            iv = createArray(16);
-
+            iv = createRandomArray(16);
         } else if (iv.length != 16) {
             throw new Error('invalid initialation vector size (must be 16 size)');
         }
@@ -516,8 +554,13 @@
         this.segmentSize = segmentSize;
 
         this._shiftRegister = coerceArray(iv, true);
-
+        this._iv = this._shiftRegister.slice(0);
         this._aes = new AES(key);
+    }
+
+    ModeOfOperationCFB.prototype.iv = function()
+    {
+        return this._iv;
     }
 
     ModeOfOperationCFB.prototype.encrypt = function(plaintext) {
@@ -577,7 +620,7 @@
         this.name = "ofb";
 
         if (!iv) {
-            iv = createArray(16);
+            iv = createRandomArray(16);
 
         } else if (iv.length != 16) {
             throw new Error('invalid initialation vector size (must be 16 bytes)');
@@ -585,8 +628,13 @@
 
         this._lastPrecipher = coerceArray(iv, true);
         this._lastPrecipherIndex = 16;
-
+        this._iv = this._lastPrecipher.slice(0);
         this._aes = new AES(key);
+    }
+
+    ModeOfOperationOFB.prototype.iv = function()
+    {
+        return this._iv;
     }
 
     ModeOfOperationOFB.prototype.encrypt = function(plaintext) {
@@ -615,16 +663,22 @@
             throw Error('Counter must be instanitated with `new`');
         }
 
-        // We allow 0, but anything false-ish uses the default 1
-        if (initialValue !== 0 && !initialValue) { initialValue = 1; }
+        // We allow 0, but anything false-ish generates a random initialization vector.
+        if (initialValue !== 0 && !initialValue) { initialValue = createRandomArray(16); }
 
         if (typeof(initialValue) === 'number') {
             this._counter = createArray(16);
             this.setValue(initialValue);
-
         } else {
             this.setBytes(initialValue);
         }
+
+        this._iv = this._counter.slice(0);
+    }
+
+    Counter.prototype.iv = function()
+    {
+        return this._iv;  
     }
 
     Counter.prototype.setValue = function(value) {
@@ -686,6 +740,16 @@
         this._remainingCounterIndex = 16;
 
         this._aes = new AES(key);
+    }
+
+    ModeOfOperationCTR.prototype.iv = function()
+    {
+        return this._counter.iv();   
+    }
+
+    ModeOfOperationCTR.prototype.ctr_iv = function()
+    {
+        return new Counter(this.iv())
     }
 
     ModeOfOperationCTR.prototype.encrypt = function(plaintext) {

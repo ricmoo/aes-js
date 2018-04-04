@@ -1,0 +1,32 @@
+<head>
+    <script type="text/javascript" src="../index.js"></script>
+    <script>
+    function f()
+    {
+        var key_256 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+               16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+               29, 30, 31];
+
+
+        var key_256_array = new Uint8Array(key_256);
+
+        
+        // Convert text to bytes
+        var text = 'Text may be any length you wish, no padding is required at all.';
+        var textBytes = aesjs.utils.utf8.toBytes(text);
+
+        aesCtr = new aesjs.ModeOfOperation.ctr(key_256_array);
+
+        var enc = aesCtr.encrypt(textBytes)
+
+        aesCtr = new aesjs.ModeOfOperation.ctr(key_256_array, aesCtr.ctr_iv());
+        console.log(aesCtr.iv())
+        console.log(aesjs.utils.utf8.fromBytes(aesCtr.decrypt(enc)));
+    }
+    
+    </script>
+</head>
+<body>
+
+    <div id="out"></div> <button onclick="f()">Test</button>
+</body>
