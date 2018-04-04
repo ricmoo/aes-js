@@ -19,7 +19,7 @@
 
         var enc = aesCtr.encrypt(textBytes)
 
-        aesCtr = new aesjs.ModeOfOperation.ctr(key_256_array, aesCtr.ctr_iv());
+        aesCtr = new aesjs.ModeOfOperation.ctr(key_256_array, aesCtr.iv());
         console.log(aesCtr.iv())
         console.log(aesjs.utils.utf8.fromBytes(aesCtr.decrypt(enc)));
     }

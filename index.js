@@ -1,6 +1,7 @@
 "use strict";
 
 (function(root) {
+    var BLOCK_SIZE = 16; 
 
     function checkInt(value) {
         return (parseInt(value) === value);
@@ -68,7 +69,7 @@
         // For Node.js Processes
         else if((typeof process !== 'undefined') && (process.release.name.search(/node|io.js/) !== -1))
         {
-            const crypto = require('crypto')
+            var crypto = require('crypto')
             crypto.randomFillSync(arr);
         }
         else
@@ -319,7 +320,7 @@
     }
 
     AES.prototype.encrypt = function(plaintext) {
-        if (plaintext.length != 16) {
+        if (plaintext.length != BLOCK_SIZE) {
             throw new Error('invalid plaintext size (must be 16 bytes)');
         }
 
@@ -345,7 +346,7 @@
         }
 
         // the last round is special
-        var result = createArray(16), tt;
+        var result = createArray(BLOCK_SIZE), tt;
         for (var i = 0; i < 4; i++) {
             tt = this._Ke[rounds][i];
             result[4 * i    ] = (S[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
@@ -358,7 +359,7 @@
     }
 
     AES.prototype.decrypt = function(ciphertext) {
-        if (ciphertext.length != 16) {
+        if (ciphertext.length != BLOCK_SIZE) {
             throw new Error('invalid ciphertext size (must be 16 bytes)');
         }
 
@@ -384,7 +385,7 @@
         }
 
         // the last round is special
-        var result = createArray(16), tt;
+        var result = createArray(BLOCK_SIZE), tt;
         for (var i = 0; i < 4; i++) {
             tt = this._Kd[rounds][i];
             result[4 * i    ] = (Si[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
@@ -419,15 +420,15 @@
     ModeOfOperationECB.prototype.encrypt = function(plaintext) {
         plaintext = coerceArray(plaintext);
 
-        if ((plaintext.length % 16) !== 0) {
+        if ((plaintext.length % BLOCK_SIZE) !== 0) {
             throw new Error('invalid plaintext size (must be multiple of 16 bytes)');
         }
 
         var ciphertext = createArray(plaintext.length);
-        var block = createArray(16);
+        var block = createArray(BLOCK_SIZE);
 
-        for (var i = 0; i < plaintext.length; i += 16) {
-            copyArray(plaintext, block, 0, i, i + 16);
+        for (var i = 0; i < plaintext.length; i += BLOCK_SIZE) {
+            copyArray(plaintext, block, 0, i, i + BLOCK_SIZE);
             block = this._aes.encrypt(block);
             copyArray(block, ciphertext, i);
         }
@@ -438,15 +439,15 @@
     ModeOfOperationECB.prototype.decrypt = function(ciphertext) {
         ciphertext = coerceArray(ciphertext);
 
-        if ((ciphertext.length % 16) !== 0) {
+        if ((ciphertext.length % BLOCK_SIZE) !== 0) {
             throw new Error('invalid ciphertext size (must be multiple of 16 bytes)');
         }
 
         var plaintext = createArray(ciphertext.length);
-        var block = createArray(16);
+        var block = createArray(BLOCK_SIZE);
 
-        for (var i = 0; i < ciphertext.length; i += 16) {
-            copyArray(ciphertext, block, 0, i, i + 16);
+        for (var i = 0; i < ciphertext.length; i += BLOCK_SIZE) {
+            copyArray(ciphertext, block, 0, i, i + BLOCK_SIZE);
             block = this._aes.decrypt(block);
             copyArray(block, plaintext, i);
         }
@@ -467,8 +468,8 @@
         this.name = "cbc";
 
         if (!iv) {
-            iv = createRandomArray(16);
-        } else if (iv.length != 16) {
+            iv = createRandomArray(BLOCK_SIZE);
+        } else if (iv.length != BLOCK_SIZE) {
             throw new Error('invalid initialation vector size (must be 16 bytes)');
         }
 
@@ -486,17 +487,17 @@
     ModeOfOperationCBC.prototype.encrypt = function(plaintext) {
         plaintext = coerceArray(plaintext);
 
-        if ((plaintext.length % 16) !== 0) {
+        if ((plaintext.length % BLOCK_SIZE) !== 0) {
             throw new Error('invalid plaintext size (must be multiple of 16 bytes)');
         }
 
         var ciphertext = createArray(plaintext.length);
-        var block = createArray(16);
+        var block = createArray(BLOCK_SIZE);
 
-        for (var i = 0; i < plaintext.length; i += 16) {
-            copyArray(plaintext, block, 0, i, i + 16);
+        for (var i = 0; i < plaintext.length; i += BLOCK_SIZE) {
+            copyArray(plaintext, block, 0, i, i + BLOCK_SIZE);
 
-            for (var j = 0; j < 16; j++) {
+            for (var j = 0; j < BLOCK_SIZE; j++) {
                 block[j] ^= this._lastCipherblock[j];
             }
 
@@ -510,22 +511,22 @@
     ModeOfOperationCBC.prototype.decrypt = function(ciphertext) {
         ciphertext = coerceArray(ciphertext);
 
-        if ((ciphertext.length % 16) !== 0) {
+        if ((ciphertext.length % BLOCK_SIZE) !== 0) {
             throw new Error('invalid ciphertext size (must be multiple of 16 bytes)');
         }
 
         var plaintext = createArray(ciphertext.length);
-        var block = createArray(16);
+        var block = createArray(BLOCK_SIZE);
 
-        for (var i = 0; i < ciphertext.length; i += 16) {
-            copyArray(ciphertext, block, 0, i, i + 16);
+        for (var i = 0; i < ciphertext.length; i += BLOCK_SIZE) {
+            copyArray(ciphertext, block, 0, i, i + BLOCK_SIZE);
             block = this._aes.decrypt(block);
 
-            for (var j = 0; j < 16; j++) {
+            for (var j = 0; j < BLOCK_SIZE; j++) {
                 plaintext[i + j] = block[j] ^ this._lastCipherblock[j];
             }
 
-            copyArray(ciphertext, this._lastCipherblock, 0, i, i + 16);
+            copyArray(ciphertext, this._lastCipherblock, 0, i, i + BLOCK_SIZE);
         }
 
         return plaintext;
@@ -544,8 +545,8 @@
         this.name = "cfb";
 
         if (!iv) {
-            iv = createRandomArray(16);
-        } else if (iv.length != 16) {
+            iv = createRandomArray(BLOCK_SIZE);
+        } else if (iv.length != BLOCK_SIZE) {
             throw new Error('invalid initialation vector size (must be 16 size)');
         }
 
@@ -579,7 +580,7 @@
 
             // Shift the register
             copyArray(this._shiftRegister, this._shiftRegister, 0, this.segmentSize);
-            copyArray(encrypted, this._shiftRegister, 16 - this.segmentSize, i, i + this.segmentSize);
+            copyArray(encrypted, this._shiftRegister, BLOCK_SIZE - this.segmentSize, i, i + this.segmentSize);
         }
 
         return encrypted;
@@ -602,7 +603,7 @@
 
             // Shift the register
             copyArray(this._shiftRegister, this._shiftRegister, 0, this.segmentSize);
-            copyArray(ciphertext, this._shiftRegister, 16 - this.segmentSize, i, i + this.segmentSize);
+            copyArray(ciphertext, this._shiftRegister, BLOCK_SIZE - this.segmentSize, i, i + this.segmentSize);
         }
 
         return plaintext;
@@ -620,14 +621,14 @@
         this.name = "ofb";
 
         if (!iv) {
-            iv = createRandomArray(16);
+            iv = createRandomArray(BLOCK_SIZE);
 
-        } else if (iv.length != 16) {
+        } else if (iv.length != BLOCK_SIZE) {
             throw new Error('invalid initialation vector size (must be 16 bytes)');
         }
 
         this._lastPrecipher = coerceArray(iv, true);
-        this._lastPrecipherIndex = 16;
+        this._lastPrecipherIndex = BLOCK_SIZE;
         this._iv = this._lastPrecipher.slice(0);
         this._aes = new AES(key);
     }
@@ -641,7 +642,7 @@
         var encrypted = coerceArray(plaintext, true);
 
         for (var i = 0; i < encrypted.length; i++) {
-            if (this._lastPrecipherIndex === 16) {
+            if (this._lastPrecipherIndex === BLOCK_SIZE) {
                 this._lastPrecipher = this._aes.encrypt(this._lastPrecipher);
                 this._lastPrecipherIndex = 0;
             }
@@ -664,10 +665,10 @@
         }
 
         // We allow 0, but anything false-ish generates a random initialization vector.
-        if (initialValue !== 0 && !initialValue) { initialValue = createRandomArray(16); }
+        if (initialValue !== 0 && !initialValue) { initialValue = createRandomArray(BLOCK_SIZE); }
 
         if (typeof(initialValue) === 'number') {
-            this._counter = createArray(16);
+            this._counter = createArray(BLOCK_SIZE);
             this.setValue(initialValue);
         } else {
             this.setBytes(initialValue);
@@ -691,7 +692,7 @@
             throw new Error('integer value out of safe range');
         }
 
-        for (var index = 15; index >= 0; --index) {
+        for (var index = BLOCK_SIZE - 1; index >= 0; --index) {
             this._counter[index] = value % 256;
             value = parseInt(value / 256);
         }
@@ -700,7 +701,7 @@
     Counter.prototype.setBytes = function(bytes) {
         bytes = coerceArray(bytes, true);
 
-        if (bytes.length != 16) {
+        if (bytes.length != BLOCK_SIZE) {
             throw new Error('invalid counter bytes size (must be 16 bytes)');
         }
 
@@ -708,7 +709,7 @@
     };
 
     Counter.prototype.increment = function() {
-        for (var i = 15; i >= 0; i--) {
+        for (var i = BLOCK_SIZE - 1; i >= 0; i--) {
             if (this._counter[i] === 255) {
                 this._counter[i] = 0;
             } else {
@@ -737,7 +738,7 @@
         this._counter = counter;
 
         this._remainingCounter = null;
-        this._remainingCounterIndex = 16;
+        this._remainingCounterIndex = BLOCK_SIZE;
 
         this._aes = new AES(key);
     }
@@ -756,7 +757,7 @@
         var encrypted = coerceArray(plaintext, true);
 
         for (var i = 0; i < encrypted.length; i++) {
-            if (this._remainingCounterIndex === 16) {
+            if (this._remainingCounterIndex === BLOCK_SIZE) {
                 this._remainingCounter = this._aes.encrypt(this._counter._counter);
                 this._remainingCounterIndex = 0;
                 this._counter.increment();
@@ -777,7 +778,7 @@
     // See:https://tools.ietf.org/html/rfc2315
     function pkcs7pad(data) {
         data = coerceArray(data, true);
-        var padder = 16 - (data.length % 16);
+        var padder = BLOCK_SIZE - (data.length % BLOCK_SIZE);
         var result = createArray(data.length + padder);
         copyArray(data, result);
         for (var i = data.length; i < result.length; i++) {
@@ -788,10 +789,10 @@
 
     function pkcs7strip(data) {
         data = coerceArray(data, true);
-        if (data.length < 16) { throw new Error('PKCS#7 invalid length'); }
+        if (data.length < BLOCK_SIZE) { throw new Error('PKCS#7 invalid length'); }
 
         var padder = data[data.length - 1];
-        if (padder > 16) { throw new Error('PKCS#7 padding byte out of range'); }
+        if (padder > BLOCK_SIZE) { throw new Error('PKCS#7 padding byte out of range'); }
 
         var length = data.length - padder;
         for (var i = 0; i < padder; i++) {
