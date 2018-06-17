@@ -216,7 +216,7 @@
             this._Kd.push([0, 0, 0, 0]);
         }
 
-        var roundKeyCount = (rounds + 1) * 4;
+        var roundKeyCount = (rounds + 1) << 2;
         var KC = this.key.length / 4;
 
         // convert the key into ints
@@ -226,8 +226,8 @@
         var index;
         for (var i = 0; i < KC; i++) {
             index = i >> 2;
-            this._Ke[index][i % 4] = tk[i];
-            this._Kd[rounds - index][i % 4] = tk[i];
+            this._Ke[index][i & 3] = tk[i];
+            this._Kd[rounds - index][i & 3] = tk[i];
         }
 
         // key expansion (fips-197 section 5.2)
@@ -269,7 +269,7 @@
             var i = 0, r, c;
             while (i < KC && t < roundKeyCount) {
                 r = t >> 2;
-                c = t % 4;
+                c = t & 3;
                 this._Ke[r][c] = tk[i];
                 this._Kd[rounds - r][c] = tk[i++];
                 t++;
@@ -306,9 +306,9 @@
         for (var r = 1; r < rounds; r++) {
             for (var i = 0; i < 4; i++) {
                 a[i] = (T1[(t[ i         ] >> 24) & 0xff] ^
-                        T2[(t[(i + 1) % 4] >> 16) & 0xff] ^
-                        T3[(t[(i + 2) % 4] >>  8) & 0xff] ^
-                        T4[ t[(i + 3) % 4]        & 0xff] ^
+                        T2[(t[(i + 1) & 3] >> 16) & 0xff] ^
+                        T3[(t[(i + 2) & 3] >>  8) & 0xff] ^
+                        T4[ t[(i + 3) & 3]        & 0xff] ^
                         this._Ke[r][i]);
             }
             t = a.slice();
@@ -318,10 +318,10 @@
         var result = createArray(16), tt;
         for (var i = 0; i < 4; i++) {
             tt = this._Ke[rounds][i];
-            result[4 * i    ] = (S[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
-            result[4 * i + 1] = (S[(t[(i + 1) % 4] >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
-            result[4 * i + 2] = (S[(t[(i + 2) % 4] >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
-            result[4 * i + 3] = (S[ t[(i + 3) % 4]        & 0xff] ^  tt       ) & 0xff;
+            result[ i << 2     ] = (S[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
+            result[(i << 2) + 1] = (S[(t[(i + 1) & 3] >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
+            result[(i << 2) + 2] = (S[(t[(i + 2) & 3] >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
+            result[(i << 2) + 3] = (S[ t[(i + 3) & 3]        & 0xff] ^  tt       ) & 0xff;
         }
 
         return result;
@@ -344,10 +344,10 @@
         // apply round transforms
         for (var r = 1; r < rounds; r++) {
             for (var i = 0; i < 4; i++) {
-                a[i] = (T5[(t[ i          ] >> 24) & 0xff] ^
-                        T6[(t[(i + 3) % 4] >> 16) & 0xff] ^
-                        T7[(t[(i + 2) % 4] >>  8) & 0xff] ^
-                        T8[ t[(i + 1) % 4]        & 0xff] ^
+                a[i] = (T5[(t[ i         ] >> 24) & 0xff] ^
+                        T6[(t[(i + 3) & 3] >> 16) & 0xff] ^
+                        T7[(t[(i + 2) & 3] >>  8) & 0xff] ^
+                        T8[ t[(i + 1) & 3]        & 0xff] ^
                         this._Kd[r][i]);
             }
             t = a.slice();
@@ -358,9 +358,9 @@
         for (var i = 0; i < 4; i++) {
             tt = this._Kd[rounds][i];
             result[4 * i    ] = (Si[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
-            result[4 * i + 1] = (Si[(t[(i + 3) % 4] >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
-            result[4 * i + 2] = (Si[(t[(i + 2) % 4] >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
-            result[4 * i + 3] = (Si[ t[(i + 1) % 4]        & 0xff] ^  tt       ) & 0xff;
+            result[4 * i + 1] = (Si[(t[(i + 3) & 3] >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
+            result[4 * i + 2] = (Si[(t[(i + 2) & 3] >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
+            result[4 * i + 3] = (Si[ t[(i + 1) & 3]        & 0xff] ^  tt       ) & 0xff;
         }
 
         return result;
@@ -637,7 +637,7 @@
         }
 
         for (var index = 15; index >= 0; --index) {
-            this._counter[index] = value % 256;
+            this._counter[index] = value & 255;
             value = parseInt(value / 256);
         }
     }
@@ -712,7 +712,7 @@
     // See:https://tools.ietf.org/html/rfc2315
     function pkcs7pad(data) {
         data = coerceArray(data, true);
-        var padder = 16 - (data.length % 16);
+        var padder = 16 - (data.length & 15);
         var result = createArray(data.length + padder);
         copyArray(data, result);
         for (var i = data.length; i < result.length; i++) {
