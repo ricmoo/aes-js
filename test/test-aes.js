@@ -17,20 +17,20 @@ function makeTest(options) {
 
     var plaintext = [];
     for (var i = 0; i < options.plaintext.length; i++) {
-        plaintext.push(new Buffer(options.plaintext[i]));
+        plaintext.push(Buffer.from(options.plaintext[i]));
     }
 
-    var key = new Buffer(options.key);
+    var key = Buffer.from(options.key);
 
     var iv = null;
-    if (options.iv) { iv = new Buffer(options.iv); }
+    if (options.iv) { iv = Buffer.from(options.iv); }
 
     var segmentSize = 0;
     if (options.segmentSize) { segmentSize = options.segmentSize; }
 
     var ciphertext = [];
     for (var i = 0; i < options.encrypted.length; i++) {
-        ciphertext.push(new Buffer(options.encrypted[i]));
+        ciphertext.push(Buffer.from(options.encrypted[i]));
     }
 
 

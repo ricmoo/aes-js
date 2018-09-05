@@ -106,9 +106,9 @@ var key_192_array = new Uint8Array(key_192);
 var key_256_array = new Uint8Array(key_256);
 
 // or, you may use Buffer in node.js:
-var key_128_buffer = new Buffer(key_128);
-var key_192_buffer = new Buffer(key_192);
-var key_256_buffer = new Buffer(key_256);
+var key_128_buffer = Buffer.from(key_128);
+var key_192_buffer = Buffer.from(key_192);
+var key_256_buffer = Buffer.from(key_256);
 ```
 
 
