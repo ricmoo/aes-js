@@ -6,6 +6,7 @@ var aes = require('../index');
 
 function newBuffer(length) {
     var buffer = Buffer.alloc(length);
+    buffer.fill(42);
     return buffer;
 }
 
@@ -29,7 +30,7 @@ module.exports = {
     "test-errors-iv-size": function(test) {
         var ivSizes = [0, 15, 17, 100];
         for (var i = 0; i < 3; i++) {
-            var keySize = newBuffer(16 + i * 8);
+            var keySize = 16 + i * 8;
 
             for (var j = 0; j < ivSizes.length; j++) {
                 test.throws(function() {
