@@ -12,7 +12,7 @@ function bufferEquals(a, b) {
 
 function makeTest (options) {
     return function(test) {
-        var result = new Buffer(options.incrementResult, 'hex');
+        var result = Buffer.from(options.incrementResult, 'hex');
 
         if (options.hasOwnProperty('nullish')) {
             var counter = new aes.Counter(options.nullish);
@@ -37,7 +37,7 @@ function makeTest (options) {
         }
 
         if (options.bytes) {
-            var bytes = new Buffer(options.bytes, 'hex');
+            var bytes = Buffer.from(options.bytes, 'hex');
 
             var counter = new aes.Counter(bytes);
             counter.increment();

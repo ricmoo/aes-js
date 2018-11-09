@@ -5,8 +5,7 @@ var nodeunit = require('nodeunit');
 var aes = require('../index');
 
 function newBuffer(length) {
-    var buffer = new Buffer(length);
-    buffer.fill(42);
+    var buffer = Buffer.alloc(length);
     return buffer;
 }
 
