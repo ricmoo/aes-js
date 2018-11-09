@@ -20,7 +20,7 @@
     function coerceArray(arg, copy) {
 
         // ArrayBuffer view
-        if (arg.buffer && ArrayBuffer.isView(arg) && arg.name === 'Uint8Array') {
+        if (arg.buffer && arg.name === 'Uint8Array') {
 
             if (copy) {
                 if (arg.slice) {
