@@ -785,7 +785,7 @@
     // http://www.requirejs.org/docs/api.html
     // https://github.com/amdjs/amdjs-api/wiki/AMD
     } else if (typeof(define) === 'function' && define.amd) {
-        define(aesjs);
+        define([], function() { return aesjs; });
 
     // Web Browsers
     } else {
