@@ -1,6 +1,6 @@
 /*global describe, it, expect*/
 var aes = require('../src/index');
-var blocks = require('./helpers').blocks;
+require('./helpers');
 
 function hexToBlock(data) {
   var block = new Array(data.length / 2);
@@ -11,8 +11,6 @@ function hexToBlock(data) {
 }
 
 describe('Counter', function() {
-  blocks();
-
   describe('test-counter-number', function() {
     function makeTestNumber(options) {
       var result = hexToBlock(options.incrementResult);
@@ -64,4 +62,3 @@ describe('Counter', function() {
     it('test-dead', function() { makeTestBytes({bytes: "deadbeefdeadbeefdeadbeefdeadbeef", incrementResult: "deadbeefdeadbeefdeadbeefdeadbef0"}); });
   });
 });
-

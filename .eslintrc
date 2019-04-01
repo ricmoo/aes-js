@@ -2,6 +2,13 @@
 env:
   node: true
   browser: true
+  es6: true
+  jest/globals: true
+plugins:
+  - jest
+extends:
+  - eslint:recommended
+  - plugin:jest/recommended
 rules:
   quotes: [0, double]
   curly: 0
@@ -13,4 +20,3 @@ rules:
   no-alert: 2
   no-unused-vars: 2
   no-undef: 2
-

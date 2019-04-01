@@ -1,6 +1,6 @@
 /*global describe, it, expect*/
 var aes = require('../src/index');
-var blocks = require('./helpers').blocks;
+require('./helpers');
 
 function makeCrypter(options) {
   var key = options.key;
@@ -23,8 +23,6 @@ function makeCrypter(options) {
 var testVectors = require('./fixtures/test-vectors.js');
 
 describe('Examples', function() {
-  blocks();
-
   testVectors.forEach(function(options) {
     it('test-' + options.modeOfOperation + '-' + options.key.length, function() {
       var encrypter = makeCrypter(options);
@@ -49,4 +47,3 @@ describe('Examples', function() {
     });
   });
 });
-

@@ -1,5 +1,3 @@
-/*global jasmine, beforeEach*/
-
 function isArray(a) {
   return a.constructor.name === 'Array' || a.constructor.name === 'Uint8Array';
 }
@@ -16,13 +14,20 @@ function blockEquality(a, b) {
   return true;
 }
 
-function blocks() {
-  beforeEach(function() {
-    jasmine.addCustomEqualityTester(blockEquality);
-  });
-}
+expect.extend({
+  toBeSagaCall(received, argument) {
+    if (blockEquality(received, argument)) {
+      return {
+        message: () => `expected ${this.utils.printExpected(received)} not to be equal to ${this.utils.printReceived(argument)}`,
+        pass: true,
+      };
+    } else {
+      return {
+        message: () => `expected ${this.utils.printExpected(received)} to be equal to ${this.utils.printReceived(argument)}`,
+        pass: false,
+      };
+    }
+  },
+});
 
-module.exports = {
-  blocks: blocks
-};
-
+module.exports = {};
