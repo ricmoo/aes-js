@@ -1,6 +1,4 @@
-/*global describe, it, expect*/
-var aes = require('../src/index');
-require('./helpers');
+const aes = require('../dist');
 
 function makeCrypter(options) {
   var key = options.key;

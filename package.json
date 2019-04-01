@@ -7,14 +7,18 @@
   "description": "A pure JavaScript implementation of the AES block cipher and all common modes of operation.",
   "devDependencies": {
     "eslint": "^5",
-    "eslint-plugin-jest": "^22.4.1",
-    "jest": "^24"
+    "eslint-plugin-jest": "^22",
+    "jest": "^24",
+    "rollup": "^1"
   },
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "rollup --config",
     "lint": "eslint src spec",
     "generate-tests": "python generate-tests.py > spec/fixtures/test-vectors.js",
-    "test": "jest"
+    "pretest": "rollup --config",
+    "test": "jest",
+    "prepublish": "rollup --config"
   },
   "repository": {
     "type": "git",
@@ -37,5 +41,10 @@
     "Andrey Kutejko <andy128k@gmail.com>"
   ],
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {},
+  "jest": {
+    "setupFilesAfterEnv": [
+      "<rootDir>/spec/helpers.js"
+    ]
+  }
 }

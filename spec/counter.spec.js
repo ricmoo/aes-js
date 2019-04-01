@@ -1,6 +1,4 @@
-/*global describe, it, expect*/
-var aes = require('../src/index');
-require('./helpers');
+const {Counter} = require('../dist');
 
 function hexToBlock(data) {
   var block = new Array(data.length / 2);
@@ -15,7 +13,7 @@ describe('Counter', function() {
     function makeTestNumber(options) {
       var result = hexToBlock(options.incrementResult);
 
-      var counter = new aes.Counter(options.number);
+      var counter = new Counter(options.number);
       counter.increment();
       expect(counter._counter).toEqual(result);
 
@@ -23,7 +21,7 @@ describe('Counter', function() {
       counter.increment();
       expect(counter._counter).toEqual(result);
 
-      counter = new aes.Counter();
+      counter = new Counter();
       counter.setValue(options.number);
       counter.increment();
       expect(counter._counter).toEqual(result);
@@ -42,7 +40,7 @@ describe('Counter', function() {
 
       var bytes = hexToBlock(options.bytes);
 
-      var counter = new aes.Counter(bytes);
+      var counter = new Counter(bytes);
       counter.increment();
       expect(counter._counter).toEqual(result);
 
@@ -50,7 +48,7 @@ describe('Counter', function() {
       counter.increment();
       expect(counter._counter).toEqual(result);
 
-      counter = new aes.Counter();
+      counter = new Counter();
       counter.setBytes(bytes);
       counter.increment();
       expect(counter._counter).toEqual(result);

@@ -29,5 +29,3 @@ expect.extend({
     }
   },
 });
-
-module.exports = {};

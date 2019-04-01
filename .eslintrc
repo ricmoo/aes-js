@@ -4,6 +4,8 @@ env:
   browser: true
   es6: true
   jest/globals: true
+parserOptions:
+  sourceType: module
 plugins:
   - jest
 extends:
