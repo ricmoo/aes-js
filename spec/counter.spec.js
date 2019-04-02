@@ -1,4 +1,4 @@
-const {Counter} = require('../dist');
+const {Counter} = require('..');
 
 function hexToBlock(data) {
   var block = new Array(data.length / 2);

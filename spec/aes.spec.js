@@ -1,4 +1,4 @@
-const aes = require('../dist');
+const aes = require('..');
 
 function makeCrypter(options) {
   var key = options.key;
