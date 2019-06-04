@@ -371,6 +371,11 @@ var key_256 = pbkdf2.pbkdf2Sync('password', 'salt', 1, 256 / 8, 'sha512');
 
 Another possibility, is to use a hashing function, such as SHA256 to hash the password, but this method is vulnerable to [Rainbow Attacks](http://en.wikipedia.org/wiki/Rainbow_table), unless you use a [salt](http://en.wikipedia.org/wiki/Salt_(cryptography)).
 
+Padding
+-------------
+
+If the plaintext is not multiple of 16 bytes you can use a third party package like [pkcs7](https://github.com/brightcove/pkcs7) to add or remove padding using pkcs7-style.
+
 Performance
 -----------
 
