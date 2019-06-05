@@ -374,7 +374,7 @@ Another possibility, is to use a hashing function, such as SHA256 to hash the pa
 Padding
 -------------
 
-If the plaintext is not multiple of 16 bytes you can use a third party package like [pkcs7](https://github.com/brightcove/pkcs7) to add or remove padding using pkcs7-style.
+If the plaintext is not multiple of 16 bytes you can use the build functions to add `aesjs.padding.pkcs7.pad(non16bytesText)` or remove `aesjs.padding.pkcs7.strip(16bytesKey)` padding using pkcs7-style.
 
 Performance
 -----------
