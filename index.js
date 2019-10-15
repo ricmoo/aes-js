@@ -188,7 +188,7 @@
 
     var AES = function(key) {
         if (!(this instanceof AES)) {
-            throw Error('AES must be instanitated with `new`');
+            throw Error('AES must be instantiated with `new`');
         }
 
         Object.defineProperty(this, 'key', {
