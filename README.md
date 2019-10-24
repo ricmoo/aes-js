@@ -78,10 +78,10 @@ var aesjs = require('aes-js');
 
 #### Web Browser
 
-To use `aes-js` in a web page, add the following:
+To use `aes-js` in a web page, you can use a CDN like [cdnjs](https://cdnjs.com/libraries/aes-js) add the following:
 
 ```html
-<script type="text/javascript" src="https://cdn.rawgit.com/ricmoo/aes-js/e27b99df/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aes-js/3.1.2/index.min.js"></script>
 ```
 
 Keys
