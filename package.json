@@ -6,8 +6,8 @@
   },
   "description": "A pure JavaScript implementation of the AES block cipher and all common modes of operation.",
   "devDependencies": {
-    "eslint": "^5",
-    "eslint-plugin-jest": "^22",
+    "eslint": "^6",
+    "eslint-plugin-jest": "^23",
     "jest": "^24",
     "rollup": "^1"
   },
