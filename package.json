@@ -19,7 +19,7 @@
     "generate-tests": "python generate-tests.py > spec/fixtures/test-vectors.js",
     "pretest": "rollup --config",
     "test": "jest",
-    "prepublish": "rollup --config"
+    "prepare": "rollup --config"
   },
   "repository": {
     "type": "git",
