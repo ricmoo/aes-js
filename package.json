@@ -9,7 +9,7 @@
     "eslint": "^6",
     "eslint-plugin-jest": "^23",
     "jest": "^25",
-    "rollup": "^1"
+    "rollup": "^2"
   },
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
