@@ -15,7 +15,7 @@
   "module": "dist/index.esm.js",
   "scripts": {
     "build": "rollup --config",
-    "lint": "eslint src spec",
+    "lint": "eslint src/**/*.mjs spec/**/*.js",
     "generate-tests": "python generate-tests.py > spec/fixtures/test-vectors.js",
     "pretest": "rollup --config",
     "test": "jest",
