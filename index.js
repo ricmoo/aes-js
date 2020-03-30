@@ -188,7 +188,7 @@
 
     var AES = function(key) {
         if (!(this instanceof AES)) {
-            throw Error('AES must be instanitated with `new`');
+            throw Error('AES must be instantiated with `new`');
         }
 
         Object.defineProperty(this, 'key', {
@@ -373,7 +373,7 @@
      */
     var ModeOfOperationECB = function(key) {
         if (!(this instanceof ModeOfOperationECB)) {
-            throw Error('AES must be instanitated with `new`');
+            throw Error('AES must be instantiated with `new`');
         }
 
         this.description = "Electronic Code Block";
@@ -426,7 +426,7 @@
      */
     var ModeOfOperationCBC = function(key, iv) {
         if (!(this instanceof ModeOfOperationCBC)) {
-            throw Error('AES must be instanitated with `new`');
+            throw Error('AES must be instantiated with `new`');
         }
 
         this.description = "Cipher Block Chaining";
@@ -436,7 +436,7 @@
             iv = createArray(16);
 
         } else if (iv.length != 16) {
-            throw new Error('invalid initialation vector size (must be 16 bytes)');
+            throw new Error('invalid initialization vector size (must be 16 bytes)');
         }
 
         this._lastCipherblock = coerceArray(iv, true);
@@ -498,7 +498,7 @@
      */
     var ModeOfOperationCFB = function(key, iv, segmentSize) {
         if (!(this instanceof ModeOfOperationCFB)) {
-            throw Error('AES must be instanitated with `new`');
+            throw Error('AES must be instantiated with `new`');
         }
 
         this.description = "Cipher Feedback";
@@ -508,7 +508,7 @@
             iv = createArray(16);
 
         } else if (iv.length != 16) {
-            throw new Error('invalid initialation vector size (must be 16 size)');
+            throw new Error('invalid initialization vector size (must be 16 size)');
         }
 
         if (!segmentSize) { segmentSize = 1; }
@@ -570,7 +570,7 @@
      */
     var ModeOfOperationOFB = function(key, iv) {
         if (!(this instanceof ModeOfOperationOFB)) {
-            throw Error('AES must be instanitated with `new`');
+            throw Error('AES must be instantiated with `new`');
         }
 
         this.description = "Output Feedback";
@@ -580,7 +580,7 @@
             iv = createArray(16);
 
         } else if (iv.length != 16) {
-            throw new Error('invalid initialation vector size (must be 16 bytes)');
+            throw new Error('invalid initialization vector size (must be 16 bytes)');
         }
 
         this._lastPrecipher = coerceArray(iv, true);
@@ -612,7 +612,7 @@
      */
     var Counter = function(initialValue) {
         if (!(this instanceof Counter)) {
-            throw Error('Counter must be instanitated with `new`');
+            throw Error('Counter must be instantiated with `new`');
         }
 
         // We allow 0, but anything false-ish uses the default 1
@@ -670,7 +670,7 @@
      */
     var ModeOfOperationCTR = function(key, counter) {
         if (!(this instanceof ModeOfOperationCTR)) {
-            throw Error('AES must be instanitated with `new`');
+            throw Error('AES must be instantiated with `new`');
         }
 
         this.description = "Counter";
