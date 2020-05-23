@@ -521,7 +521,7 @@
     }
 
     ModeOfOperationCFB.prototype.encrypt = function(plaintext) {
-        if ((plaintext.length % this.segmentSize) != 0) {
+        if (((plaintext.length * this.segmentSize) % this.segmentSize) != 0) {
             throw new Error('invalid plaintext size (must be segmentSize bytes)');
         }
 
@@ -543,7 +543,7 @@
     }
 
     ModeOfOperationCFB.prototype.decrypt = function(ciphertext) {
-        if ((ciphertext.length % this.segmentSize) != 0) {
+        if (((ciphertext.length * this.segmentSize) % this.segmentSize) != 0) {
             throw new Error('invalid ciphertext size (must be segmentSize bytes)');
         }
 

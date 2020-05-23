@@ -61,7 +61,7 @@ module.exports = {
 
                 var moo = new aes.ModeOfOperation.cfb(key, iv, i);
 
-                test.throws(function() {
+                test.doesNotThrow(function() {
                     moo.encrypt(newBuffer(j));
                 }, function(error) {
                     return (error.message === 'invalid plaintext size (must be segmentSize bytes)');
