@@ -295,35 +295,73 @@
         }
 
         var rounds = this._Ke.length - 1;
-        var a = [0, 0, 0, 0];
+        var a0 = 0;
+        var a1 = 0;
+        var a2 = 0;
+        var a3 = 0;
 
         // convert plaintext to (ints ^ key)
         var t = convertToInt32(plaintext);
-        for (var i = 0; i < 4; i++) {
-            t[i] ^= this._Ke[0][i];
-        }
-
+        var t0 = t[0] ^ this._Ke[0][0];
+        var t1 = t[1] ^ this._Ke[0][1];
+        var t2 = t[2] ^ this._Ke[0][2];
+        var t3 = t[3] ^ this._Ke[0][3];
         // apply round transforms
         for (var r = 1; r < rounds; r++) {
-            for (var i = 0; i < 4; i++) {
-                a[i] = (T1[(t[ i         ] >> 24) & 0xff] ^
-                        T2[(t[(i + 1) % 4] >> 16) & 0xff] ^
-                        T3[(t[(i + 2) % 4] >>  8) & 0xff] ^
-                        T4[ t[(i + 3) % 4]        & 0xff] ^
-                        this._Ke[r][i]);
-            }
-            t = a.slice();
+            a0 = (T1[(t0 >> 24) & 0xff] ^
+                  T2[(t1 >> 16) & 0xff] ^
+                  T3[(t2 >>  8) & 0xff] ^
+                  T4[ t3        & 0xff] ^
+                        this._Ke[r][0]);
+
+            a1 = (T1[(t1 >> 24) & 0xff] ^
+                  T2[(t2 >> 16) & 0xff] ^
+                  T3[(t3 >>  8) & 0xff] ^
+                  T4[ t0        & 0xff] ^
+                        this._Ke[r][1]);
+
+            a2 = (T1[(t2 >> 24) & 0xff] ^
+                  T2[(t3 >> 16) & 0xff] ^
+                  T3[(t0 >>  8) & 0xff] ^
+                  T4[ t1        & 0xff] ^
+                        this._Ke[r][2]);
+
+            a3 = (T1[(t3 >> 24) & 0xff] ^
+                  T2[(t0 >> 16) & 0xff] ^
+                  T3[(t1 >>  8) & 0xff] ^
+                  T4[ t2        & 0xff] ^
+                        this._Ke[r][3]);
+            t0 = a0;
+            t1 = a1;
+            t2 = a2;
+            t3 = a3;
         }
 
         // the last round is special
         var result = createArray(16), tt;
-        for (var i = 0; i < 4; i++) {
-            tt = this._Ke[rounds][i];
-            result[4 * i    ] = (S[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
-            result[4 * i + 1] = (S[(t[(i + 1) % 4] >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
-            result[4 * i + 2] = (S[(t[(i + 2) % 4] >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
-            result[4 * i + 3] = (S[ t[(i + 3) % 4]        & 0xff] ^  tt       ) & 0xff;
-        }
+        tt = this._Ke[rounds][0];
+        result[0] = (S[(t0 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
+        result[1] = (S[(t1 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
+        result[2] = (S[(t2 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
+        result[3] = (S[ t3        & 0xff] ^  tt       ) & 0xff;
+
+        tt = this._Ke[rounds][1];
+        result[4] = (S[(t1 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
+        result[5] = (S[(t2 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
+        result[6] = (S[(t3 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
+        result[7] = (S[ t0        & 0xff] ^  tt       ) & 0xff;
+
+        tt = this._Ke[rounds][2];
+        result[8] =  (S[(t2 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
+        result[9] =  (S[(t3 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
+        result[10] = (S[(t0 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
+        result[11] = (S[t1         & 0xff] ^  tt       ) & 0xff;
+
+        tt = this._Ke[rounds][3];
+        result[12] = (S[(t3 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
+        result[13] = (S[(t0 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
+        result[14] = (S[(t1 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
+        result[15] = (S[ t2        & 0xff] ^  tt       ) & 0xff;
 
         return result;
     }
@@ -334,35 +372,74 @@
         }
 
         var rounds = this._Kd.length - 1;
-        var a = [0, 0, 0, 0];
+        var a0 = 0;
+        var a1 = 0;
+        var a2 = 0;
+        var a3 = 0;
 
         // convert plaintext to (ints ^ key)
         var t = convertToInt32(ciphertext);
-        for (var i = 0; i < 4; i++) {
-            t[i] ^= this._Kd[0][i];
-        }
+        var t0 = t[0] ^ this._Kd[0][0];
+        var t1 = t[1] ^ this._Kd[0][1];
+        var t2 = t[2] ^ this._Kd[0][2];
+        var t3 = t[3] ^ this._Kd[0][3];
 
         // apply round transforms
         for (var r = 1; r < rounds; r++) {
-            for (var i = 0; i < 4; i++) {
-                a[i] = (T5[(t[ i          ] >> 24) & 0xff] ^
-                        T6[(t[(i + 3) % 4] >> 16) & 0xff] ^
-                        T7[(t[(i + 2) % 4] >>  8) & 0xff] ^
-                        T8[ t[(i + 1) % 4]        & 0xff] ^
-                        this._Kd[r][i]);
-            }
-            t = a.slice();
+            a0 = (T5[(t0 >> 24) & 0xff] ^
+                  T6[(t3 >> 16) & 0xff] ^
+                  T7[(t2 >>  8) & 0xff] ^
+                  T8[ t1        & 0xff] ^
+                        this._Kd[r][0]);
+
+            a1 = (T5[(t1 >> 24) & 0xff] ^
+                  T6[(t0 >> 16) & 0xff] ^
+                  T7[(t3 >>  8) & 0xff] ^
+                  T8[ t2        & 0xff] ^
+                        this._Kd[r][1]);
+
+            a2 = (T5[(t2 >> 24) & 0xff] ^
+                  T6[(t1 >> 16) & 0xff] ^
+                  T7[(t0 >>  8) & 0xff] ^
+                  T8[ t3        & 0xff] ^
+                        this._Kd[r][2]);
+
+            a3 = (T5[(t3 >> 24) & 0xff] ^
+                  T6[(t2 >> 16) & 0xff] ^
+                  T7[(t1 >>  8) & 0xff] ^
+                  T8[ t0        & 0xff] ^
+                        this._Kd[r][3]);
+            t0 = a0;
+            t1 = a1;
+            t2 = a2;
+            t3 = a3;
         }
 
         // the last round is special
         var result = createArray(16), tt;
-        for (var i = 0; i < 4; i++) {
-            tt = this._Kd[rounds][i];
-            result[4 * i    ] = (Si[(t[ i         ] >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
-            result[4 * i + 1] = (Si[(t[(i + 3) % 4] >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
-            result[4 * i + 2] = (Si[(t[(i + 2) % 4] >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
-            result[4 * i + 3] = (Si[ t[(i + 1) % 4]        & 0xff] ^  tt       ) & 0xff;
-        }
+        tt = this._Kd[rounds][0];
+        result[0] = (Si[(t0 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
+        result[1] = (Si[(t3 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
+        result[2] = (Si[(t2 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
+        result[3] = (Si[ t1        & 0xff] ^  tt       ) & 0xff;
+
+        tt = this._Kd[rounds][1];
+        result[4] = (Si[(t1 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
+        result[5] = (Si[(t0 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
+        result[6] = (Si[(t3 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
+        result[7] = (Si[ t2        & 0xff] ^  tt       ) & 0xff;
+
+        tt = this._Kd[rounds][2];
+        result[8] =  (Si[(t2 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
+        result[9] =  (Si[(t1 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
+        result[10] = (Si[(t0 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
+        result[11] = (Si[t3         & 0xff] ^  tt       ) & 0xff;
+
+        tt = this._Kd[rounds][3];
+        result[12] = (Si[(t3 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
+        result[13] = (Si[(t2 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
+        result[14] = (Si[(t1 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
+        result[15] = (Si[ t0        & 0xff] ^  tt       ) & 0xff;
 
         return result;
     }
