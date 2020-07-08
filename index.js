@@ -301,22 +301,22 @@
         var a3 = 0;
 
         // convert plaintext to (ints ^ key)
-        var t0 = ((plaintext[0] << 24) |
-                 (plaintext[1] << 16) |
-                 (plaintext[2] <<  8) |
-                  plaintext[3]) ^ this._Ke[0][0];
-        var t1 = ((plaintext[4] << 24) |
-                 (plaintext[5] << 16) |
-                 (plaintext[6] <<  8) |
-                  plaintext[7]) ^ this._Ke[0][1];
-        var t2 = ((plaintext[8] << 24) |
-                 (plaintext[9] << 16) |
-                 (plaintext[10] <<  8) |
-                  plaintext[11]) ^ this._Ke[0][2];
+        var t0 = ((plaintext[0]  << 24) |
+                  (plaintext[1]  << 16) |
+                  (plaintext[2]  <<  8) |
+                   plaintext[3])  ^ this._Ke[0][0];
+        var t1 = ((plaintext[4]  << 24) |
+                  (plaintext[5]  << 16) |
+                  (plaintext[6]  <<  8) |
+                   plaintext[7])  ^ this._Ke[0][1];
+        var t2 = ((plaintext[8]  << 24) |
+                  (plaintext[9]  << 16) |
+                  (plaintext[10] <<  8) |
+                   plaintext[11]) ^ this._Ke[0][2];
         var t3 = ((plaintext[12] << 24) |
-                 (plaintext[13] << 16) |
-                 (plaintext[14] <<  8) |
-                  plaintext[15]) ^ this._Ke[0][3];
+                  (plaintext[13] << 16) |
+                  (plaintext[14] <<  8) |
+                   plaintext[15]) ^ this._Ke[0][3];
         // apply round transforms
         for (var r = 1; r < rounds; r++) {
             a0 = (T1[(t0 >> 24) & 0xff] ^
@@ -389,22 +389,22 @@
         var a3 = 0;
 
         // convert plaintext to (ints ^ key)
-        var t0 = ((ciphertext[0] << 24) |
-                 (ciphertext[1] << 16) |
-                 (ciphertext[2] <<  8) |
-                  ciphertext[3]) ^ this._Kd[0][0];
-        var t1 = ((ciphertext[4] << 24) |
-                 (ciphertext[5] << 16) |
-                 (ciphertext[6] <<  8) |
-                  ciphertext[7]) ^ this._Kd[0][1];
-        var t2 = ((ciphertext[8] << 24) |
-                 (ciphertext[9] << 16) |
-                 (ciphertext[10] <<  8) |
-                  ciphertext[11]) ^ this._Kd[0][2];
+        var t0 = ((ciphertext[0]  << 24) |
+                  (ciphertext[1]  << 16) |
+                  (ciphertext[2]  <<  8) |
+                   ciphertext[3])  ^ this._Kd[0][0];
+        var t1 = ((ciphertext[4]  << 24) |
+                  (ciphertext[5]  << 16) |
+                  (ciphertext[6]  <<  8) |
+                   ciphertext[7])  ^ this._Kd[0][1];
+        var t2 = ((ciphertext[8]  << 24) |
+                  (ciphertext[9]  << 16) |
+                  (ciphertext[10] <<  8) |
+                   ciphertext[11]) ^ this._Kd[0][2];
         var t3 = ((ciphertext[12] << 24) |
-                 (ciphertext[13] << 16) |
-                 (ciphertext[14] <<  8) |
-                  ciphertext[15]) ^ this._Kd[0][3];
+                  (ciphertext[13] << 16) |
+                  (ciphertext[14] <<  8) |
+                   ciphertext[15]) ^ this._Kd[0][3];
 
         // apply round transforms
         for (var r = 1; r < rounds; r++) {
