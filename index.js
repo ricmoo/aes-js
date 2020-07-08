@@ -206,29 +206,28 @@
             throw new Error('invalid key size (must be 16, 24 or 32 bytes)');
         }
 
-        // encryption round keys
-        this._Ke = [];
-
-        // decryption round keys
-        this._Kd = [];
-
-        for (var i = 0; i <= rounds; i++) {
-            this._Ke.push([0, 0, 0, 0]);
-            this._Kd.push([0, 0, 0, 0]);
-        }
-
         var roundKeyCount = (rounds + 1) * 4;
         var KC = this.key.length / 4;
+
+        // encryption round keys
+        this._Ke = new Array(roundKeyCount);
+
+        // decryption round keys
+        this._Kd = new Array(roundKeyCount);
+
+        for (var i = 0; i < roundKeyCount; i++) {
+            this._Ke[i] = 0;
+            this._Kd[i] = 0;
+        }
+
 
         // convert the key into ints
         var tk = convertToInt32(this.key);
 
         // copy values into round key arrays
-        var index;
         for (var i = 0; i < KC; i++) {
-            index = i >> 2;
-            this._Ke[index][i % 4] = tk[i];
-            this._Kd[rounds - index][i % 4] = tk[i];
+            this._Ke[i] = tk[i];
+            this._Kd[(rounds - (i >> 2))*4 + (i % 4)] = tk[i];
         }
 
         // key expansion (fips-197 section 5.2)
@@ -267,12 +266,10 @@
             }
 
             // copy values into round key arrays
-            var i = 0, r, c;
+            var i = 0;
             while (i < KC && t < roundKeyCount) {
-                r = t >> 2;
-                c = t % 4;
-                this._Ke[r][c] = tk[i];
-                this._Kd[rounds - r][c] = tk[i++];
+                this._Ke[t] = tk[i];
+                this._Kd[(rounds - (t >> 2))*4 + (t % 4)] = tk[i++];
                 t++;
             }
         }
@@ -280,11 +277,11 @@
         // inverse-cipher-ify the decryption round key (fips-197 section 5.3)
         for (var r = 1; r < rounds; r++) {
             for (var c = 0; c < 4; c++) {
-                tt = this._Kd[r][c];
-                this._Kd[r][c] = (U1[(tt >> 24) & 0xFF] ^
-                                  U2[(tt >> 16) & 0xFF] ^
-                                  U3[(tt >>  8) & 0xFF] ^
-                                  U4[ tt        & 0xFF]);
+                tt = this._Kd[4 * r + c];
+                this._Kd[4 * r + c] = (U1[(tt >> 24) & 0xFF] ^
+                                       U2[(tt >> 16) & 0xFF] ^
+                                       U3[(tt >>  8) & 0xFF] ^
+                                       U4[ tt        & 0xFF]);
             }
         }
     }
@@ -294,7 +291,7 @@
             throw new Error('invalid plaintext size (must be 16 bytes)');
         }
 
-        var rounds = this._Ke.length - 1;
+        var rounds = this._Ke.length / 4 - 1;
         var a0 = 0;
         var a1 = 0;
         var a2 = 0;
@@ -304,44 +301,44 @@
         var t0 = ((plaintext[0]  << 24) |
                   (plaintext[1]  << 16) |
                   (plaintext[2]  <<  8) |
-                   plaintext[3])  ^ this._Ke[0][0];
+                   plaintext[3])  ^ this._Ke[0];
         var t1 = ((plaintext[4]  << 24) |
                   (plaintext[5]  << 16) |
                   (plaintext[6]  <<  8) |
-                   plaintext[7])  ^ this._Ke[0][1];
+                   plaintext[7])  ^ this._Ke[1];
         var t2 = ((plaintext[8]  << 24) |
                   (plaintext[9]  << 16) |
                   (plaintext[10] <<  8) |
-                   plaintext[11]) ^ this._Ke[0][2];
+                   plaintext[11]) ^ this._Ke[2];
         var t3 = ((plaintext[12] << 24) |
                   (plaintext[13] << 16) |
                   (plaintext[14] <<  8) |
-                   plaintext[15]) ^ this._Ke[0][3];
+                   plaintext[15]) ^ this._Ke[3];
         // apply round transforms
         for (var r = 1; r < rounds; r++) {
             a0 = (T1[(t0 >> 24) & 0xff] ^
                   T2[(t1 >> 16) & 0xff] ^
                   T3[(t2 >>  8) & 0xff] ^
                   T4[ t3        & 0xff] ^
-                        this._Ke[r][0]);
+                        this._Ke[4 * r]);
 
             a1 = (T1[(t1 >> 24) & 0xff] ^
                   T2[(t2 >> 16) & 0xff] ^
                   T3[(t3 >>  8) & 0xff] ^
                   T4[ t0        & 0xff] ^
-                        this._Ke[r][1]);
+                        this._Ke[4 * r + 1]);
 
             a2 = (T1[(t2 >> 24) & 0xff] ^
                   T2[(t3 >> 16) & 0xff] ^
                   T3[(t0 >>  8) & 0xff] ^
                   T4[ t1        & 0xff] ^
-                        this._Ke[r][2]);
+                        this._Ke[4 * r + 2]);
 
             a3 = (T1[(t3 >> 24) & 0xff] ^
                   T2[(t0 >> 16) & 0xff] ^
                   T3[(t1 >>  8) & 0xff] ^
                   T4[ t2        & 0xff] ^
-                        this._Ke[r][3]);
+                        this._Ke[4 * r + 3]);
             t0 = a0;
             t1 = a1;
             t2 = a2;
@@ -350,25 +347,25 @@
 
         // the last round is special
         var result = createArray(16), tt;
-        tt = this._Ke[rounds][0];
+        tt = this._Ke[4 * rounds];
         result[0] = (S[(t0 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
         result[1] = (S[(t1 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
         result[2] = (S[(t2 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
         result[3] = (S[ t3        & 0xff] ^  tt       ) & 0xff;
 
-        tt = this._Ke[rounds][1];
+        tt = this._Ke[4 * rounds + 1];
         result[4] = (S[(t1 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
         result[5] = (S[(t2 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
         result[6] = (S[(t3 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
         result[7] = (S[ t0        & 0xff] ^  tt       ) & 0xff;
 
-        tt = this._Ke[rounds][2];
+        tt = this._Ke[4 * rounds + 2];
         result[8] =  (S[(t2 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
         result[9] =  (S[(t3 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
         result[10] = (S[(t0 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
         result[11] = (S[t1         & 0xff] ^  tt       ) & 0xff;
 
-        tt = this._Ke[rounds][3];
+        tt = this._Ke[4 * rounds + 3];
         result[12] = (S[(t3 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
         result[13] = (S[(t0 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
         result[14] = (S[(t1 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
@@ -382,7 +379,7 @@
             throw new Error('invalid ciphertext size (must be 16 bytes)');
         }
 
-        var rounds = this._Kd.length - 1;
+        var rounds = this._Kd.length / 4 - 1;
         var a0 = 0;
         var a1 = 0;
         var a2 = 0;
@@ -392,19 +389,19 @@
         var t0 = ((ciphertext[0]  << 24) |
                   (ciphertext[1]  << 16) |
                   (ciphertext[2]  <<  8) |
-                   ciphertext[3])  ^ this._Kd[0][0];
+                   ciphertext[3])  ^ this._Kd[0];
         var t1 = ((ciphertext[4]  << 24) |
                   (ciphertext[5]  << 16) |
                   (ciphertext[6]  <<  8) |
-                   ciphertext[7])  ^ this._Kd[0][1];
+                   ciphertext[7])  ^ this._Kd[1];
         var t2 = ((ciphertext[8]  << 24) |
                   (ciphertext[9]  << 16) |
                   (ciphertext[10] <<  8) |
-                   ciphertext[11]) ^ this._Kd[0][2];
+                   ciphertext[11]) ^ this._Kd[2];
         var t3 = ((ciphertext[12] << 24) |
                   (ciphertext[13] << 16) |
                   (ciphertext[14] <<  8) |
-                   ciphertext[15]) ^ this._Kd[0][3];
+                   ciphertext[15]) ^ this._Kd[3];
 
         // apply round transforms
         for (var r = 1; r < rounds; r++) {
@@ -412,25 +409,25 @@
                   T6[(t3 >> 16) & 0xff] ^
                   T7[(t2 >>  8) & 0xff] ^
                   T8[ t1        & 0xff] ^
-                        this._Kd[r][0]);
+                        this._Kd[4 * r]);
 
             a1 = (T5[(t1 >> 24) & 0xff] ^
                   T6[(t0 >> 16) & 0xff] ^
                   T7[(t3 >>  8) & 0xff] ^
                   T8[ t2        & 0xff] ^
-                        this._Kd[r][1]);
+                        this._Kd[4 * r + 1]);
 
             a2 = (T5[(t2 >> 24) & 0xff] ^
                   T6[(t1 >> 16) & 0xff] ^
                   T7[(t0 >>  8) & 0xff] ^
                   T8[ t3        & 0xff] ^
-                        this._Kd[r][2]);
+                        this._Kd[4 * r + 2]);
 
             a3 = (T5[(t3 >> 24) & 0xff] ^
                   T6[(t2 >> 16) & 0xff] ^
                   T7[(t1 >>  8) & 0xff] ^
                   T8[ t0        & 0xff] ^
-                        this._Kd[r][3]);
+                        this._Kd[4 * r + 3]);
             t0 = a0;
             t1 = a1;
             t2 = a2;
@@ -439,25 +436,25 @@
 
         // the last round is special
         var result = createArray(16), tt;
-        tt = this._Kd[rounds][0];
+        tt = this._Kd[4 * rounds];
         result[0] = (Si[(t0 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
         result[1] = (Si[(t3 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
         result[2] = (Si[(t2 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
         result[3] = (Si[ t1        & 0xff] ^  tt       ) & 0xff;
 
-        tt = this._Kd[rounds][1];
+        tt = this._Kd[4 * rounds + 1];
         result[4] = (Si[(t1 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
         result[5] = (Si[(t0 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
         result[6] = (Si[(t3 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
         result[7] = (Si[ t2        & 0xff] ^  tt       ) & 0xff;
 
-        tt = this._Kd[rounds][2];
+        tt = this._Kd[4 * rounds + 2];
         result[8] =  (Si[(t2 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
         result[9] =  (Si[(t1 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
         result[10] = (Si[(t0 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
         result[11] = (Si[t3         & 0xff] ^  tt       ) & 0xff;
 
-        tt = this._Kd[rounds][3];
+        tt = this._Kd[4 * rounds + 3];
         result[12] = (Si[(t3 >> 24) & 0xff] ^ (tt >> 24)) & 0xff;
         result[13] = (Si[(t2 >> 16) & 0xff] ^ (tt >> 16)) & 0xff;
         result[14] = (Si[(t1 >>  8) & 0xff] ^ (tt >>  8)) & 0xff;
