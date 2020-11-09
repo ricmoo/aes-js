@@ -1,7 +1,7 @@
 AES-ES
 ======
 
-[![Build Status](https://travis-ci.org/andy128k/aes-es.svg?branch=master)](https://travis-ci.org/andy128k/aes-es)
+[![Build](https://github.com/andy128k/aes-es/workflows/Test/badge.svg?branch=master&event=push)](https://github.com/andy128k/aes-es/actions?query=workflow%3ATest)
 
 A pure JavaScript implementation of the AES block cipher algorithm and all common modes of operation (CBC, CFB, CTR, ECB and OFB).
 
