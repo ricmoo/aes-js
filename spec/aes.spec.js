@@ -1,36 +1,35 @@
 const aes = require('..');
 
 function makeCrypter(options) {
-  var key = options.key;
   switch (options.modeOfOperation) {
   case 'ecb':
-    return new aes.ECB(key);
+    return new aes.ECB(options.key);
   case 'cfb':
-    return new aes.CFB(key, options.iv, options.segmentSize);
+    return new aes.CFB(options.key, options.iv, options.segmentSize);
   case 'ofb':
-    return new aes.OFB(key, options.iv);
+    return new aes.OFB(options.key, options.iv);
   case 'cbc':
-    return new aes.CBC(key, options.iv);
+    return new aes.CBC(options.key, options.iv);
   case 'ctr':
-    return new aes.CTR(key, new aes.Counter(0));
+    return new aes.CTR(options.key, new aes.Counter(0));
   default:
     throw new Error('unknwon mode of operation');
   }
 }
 
-var testVectors = require('./fixtures/test-vectors.js');
+const testVectors = require('./fixtures/test-vectors.js');
 
 describe('Examples', function() {
   testVectors.forEach(function(options) {
     it('test-' + options.modeOfOperation + '-' + options.key.length, function() {
-      var encrypter = makeCrypter(options);
-      var decrypter = makeCrypter(options);
+      const encrypter = makeCrypter(options);
+      const decrypter = makeCrypter(options);
 
-      for (var i = 0; i < options.plaintext.length; i++) {
-        var plaintext = options.plaintext[i].slice();
-        var ciphertext = options.encrypted[i].slice();
-        var encrypted = new Array(plaintext.length);
-        var decrypted = new Array(ciphertext.length);
+      for (let i = 0; i < options.plaintext.length; i++) {
+        const plaintext = options.plaintext[i].slice();
+        const ciphertext = options.encrypted[i].slice();
+        const encrypted = new Array(plaintext.length);
+        const decrypted = new Array(ciphertext.length);
 
         encrypter.encrypt(plaintext, encrypted);
         decrypter.decrypt(ciphertext, decrypted);

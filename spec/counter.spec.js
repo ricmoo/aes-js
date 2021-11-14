@@ -1,62 +1,52 @@
 const {Counter} = require('..');
 
-function hexToBlock(data) {
-  var block = new Array(data.length / 2);
-  for (var i = 0; i < data.length; i += 2) {
+function hex(data) {
+  const block = new Array(data.length / 2);
+  for (let i = 0; i < data.length; i += 2) {
     block[i / 2] = parseInt(data.substring(i, i + 2), 16);
   }
   return block;
 }
 
-describe('Counter', function() {
-  describe('test-counter-number', function() {
-    function makeTestNumber(options) {
-      var result = hexToBlock(options.incrementResult);
+describe('Counter', () => {
+  it.each([
+    [0,   hex('00000000000000000000000000000001')],
+    [1,   hex('00000000000000000000000000000002')],
+    [254, hex('000000000000000000000000000000ff')],
+    [255, hex('00000000000000000000000000000100')],
+    [256, hex('00000000000000000000000000000101')],
+  ])('test-counter-number %#', (number, result) => {
+    let counter = new Counter(number);
+    counter.increment();
+    expect(counter._counter).toEqual(result);
 
-      var counter = new Counter(options.number);
-      counter.increment();
-      expect(counter._counter).toEqual(result);
+    counter.setValue(number);
+    counter.increment();
+    expect(counter._counter).toEqual(result);
 
-      counter.setValue(options.number);
-      counter.increment();
-      expect(counter._counter).toEqual(result);
-
-      counter = new Counter();
-      counter.setValue(options.number);
-      counter.increment();
-      expect(counter._counter).toEqual(result);
-    }
-
-    it('test-0', function() { makeTestNumber({number: 0, incrementResult: "00000000000000000000000000000001"}); });
-    it('test-1', function() { makeTestNumber({number: 1, incrementResult: "00000000000000000000000000000002"}); });
-    it('test-254', function() { makeTestNumber({number: 254, incrementResult: "000000000000000000000000000000ff"}); });
-    it('test-255', function() { makeTestNumber({number: 255, incrementResult: "00000000000000000000000000000100"}); });
-    it('test-256', function() { makeTestNumber({number: 256, incrementResult: "00000000000000000000000000000101"}); });
+    counter = new Counter();
+    counter.setValue(number);
+    counter.increment();
+    expect(counter._counter).toEqual(result);
   });
 
-  describe('test-counter-bytes', function() {
-    function makeTestBytes(options) {
-      var result = hexToBlock(options.incrementResult);
+  it.each([
+    [hex('00000000000000000000000000000000'), hex('00000000000000000000000000000001')],
+    [hex('000000000000000000000000000000ff'), hex('00000000000000000000000000000100')],
+    [hex('ffffffffffffffffffffffffffffffff'), hex('00000000000000000000000000000000')],
+    [hex('deadbeefdeadbeefdeadbeefdeadbeef'), hex('deadbeefdeadbeefdeadbeefdeadbef0')],
+  ])('test-counter-bytes %#', (bytes, result) => {
+    let counter = new Counter(bytes);
+    counter.increment();
+    expect(counter._counter).toEqual(result);
 
-      var bytes = hexToBlock(options.bytes);
+    counter.setBytes(bytes);
+    counter.increment();
+    expect(counter._counter).toEqual(result);
 
-      var counter = new Counter(bytes);
-      counter.increment();
-      expect(counter._counter).toEqual(result);
-
-      counter.setBytes(bytes);
-      counter.increment();
-      expect(counter._counter).toEqual(result);
-
-      counter = new Counter();
-      counter.setBytes(bytes);
-      counter.increment();
-      expect(counter._counter).toEqual(result);
-    }
-
-    it('test-0000', function() { makeTestBytes({bytes: "00000000000000000000000000000000", incrementResult: "00000000000000000000000000000001"}); });
-    it('test-00ff', function() { makeTestBytes({bytes: "000000000000000000000000000000ff", incrementResult: "00000000000000000000000000000100"}); });
-    it('test-ffff', function() { makeTestBytes({bytes: "ffffffffffffffffffffffffffffffff", incrementResult: "00000000000000000000000000000000"}); });
-    it('test-dead', function() { makeTestBytes({bytes: "deadbeefdeadbeefdeadbeefdeadbeef", incrementResult: "deadbeefdeadbeefdeadbeefdeadbef0"}); });
+    counter = new Counter();
+    counter.setBytes(bytes);
+    counter.increment();
+    expect(counter._counter).toEqual(result);
   });
 });

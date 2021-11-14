@@ -15,7 +15,7 @@ export class CTR {
   }
 
   encrypt(plaintext, result) {
-    for (var i = 0; i < plaintext.length; i++) {
+    for (let i = 0; i < plaintext.length; i++) {
       if (this._remainingCounterIndex === 16) {
         this._aes.encrypt(this._counter._counter, this._remainingCounter);
         this._remainingCounterIndex = 0;

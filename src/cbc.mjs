@@ -2,7 +2,7 @@ import {AES} from './aes.mjs';
 import {copyIV} from './iv';
 
 function xorBlocks(result, first, second) {
-  for (var i = 0; i < result.length; i++) {
+  for (let i = 0; i < result.length; i++) {
     result[i] = first[i] ^ second[i];
   }
 }
@@ -12,8 +12,9 @@ function xorBlocks(result, first, second) {
  */
 export class CBC {
   constructor(key, iv) {
-    if (iv && iv.length !== 16)
+    if (iv && iv.length !== 16) {
       throw new Error('initialation vector iv must be of length 16');
+    }
 
     this.description = "Cipher Block Chaining";
     this.name = "cbc";

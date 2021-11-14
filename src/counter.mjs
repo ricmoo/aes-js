@@ -16,7 +16,7 @@ export class Counter {
       throw new Error('value must be a number');
     }
 
-    for (var index = 15; index >= 0; --index) {
+    for (let index = 15; index >= 0; --index) {
       this._counter[index] = value % 256;
       value = value >> 8;
     }
@@ -30,8 +30,8 @@ export class Counter {
   }
 
   increment() {
-    for (var i = 15; i >= 0; i--) {
-      var digit = this._counter[i];
+    for (let i = 15; i >= 0; i--) {
+      const digit = this._counter[i];
       if (digit === 255) {
         this._counter[i] = 0;
       } else {

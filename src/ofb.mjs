@@ -7,7 +7,7 @@ import {copyIV} from './iv';
 export class OFB {
   constructor(key, iv) {
     if (iv && iv.length !== 16)
-      throw new Error('initialation vector iv must be of length 16');
+      {throw new Error('initialation vector iv must be of length 16');}
 
     this.description = "Output Feedback";
     this.name = "ofb";
@@ -18,7 +18,7 @@ export class OFB {
   }
 
   encrypt(plaintext, result) {
-    for (var i = 0; i < plaintext.length; i++) {
+    for (let i = 0; i < plaintext.length; i++) {
       if (this._lastPrecipherIndex === 16) {
         this._aes.encrypt(this._lastPrecipher, this._lastPrecipher);
         this._lastPrecipherIndex = 0;
