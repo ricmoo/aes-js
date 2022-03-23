@@ -6,21 +6,3 @@ export declare class AES {
     encrypt(plaintext: Uint8Array): Uint8Array;
     decrypt(ciphertext: Uint8Array): Uint8Array;
 }
-/**
- *  Mode Of Operation - Electonic Codebook (ECB)
- */
-/**
- *  Mode Of Operation - Cipher Block Chaining (CBC)
- */
-/**
- *  Mode Of Operation - Cipher Feedback (CFB)
- */
-/**
- *  Mode Of Operation - Output Feedback (OFB)
- */
-/**
- *  Counter object for CTR common mode of operation
- */
-/**
- *  Mode Of Operation - Counter (CTR)
- */
