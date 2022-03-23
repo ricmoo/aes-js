@@ -1,22 +1,24 @@
 {
   "name": "aes-js",
-  "version": "3.1.2",
-  "bugs": {
-    "url": "http://github.com/ricmoo/aes-js/issues",
-    "email": "github@ricmoo.com"
-  },
+  "version": "4.0.0-beta.1",
   "description": "A pure JavaScript implementation of the AES block cipher and all common modes of operation.",
   "devDependencies": {
-    "nodeunit": "^0.9.1"
+    "@types/mocha": "^9.1.0",
+    "@types/node": "^16.7.10",
+    "mocha": "^9.2.2",
+    "typescript": "^4.6.2"
   },
-  "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/nodeunit test/index.js"
+    "build": "tsc --build ./tsconfig.json",
+    "auto-build": "npm run build -- -w",
+    "test": "mocha ./lib/tests.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/ricmoo/aes-js.git"
+  "main": "./lib/index.js",
+  "publishConfig": {
+    "tag": "beta"
   },
+  "type": "module",
+  "types": "./lib/types.d.ts",
   "keywords": [
     "aes",
     "aes-ctr",
@@ -29,6 +31,14 @@
     "block",
     "cipher"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ricmoo/aes-js.git"
+  },
+  "bugs": {
+    "url": "http://github.com/ricmoo/aes-js/issues",
+    "email": "github@ricmoo.com"
+  },
   "author": "Richard Moore <me@ricmoo.com>",
   "license": "MIT"
 }
