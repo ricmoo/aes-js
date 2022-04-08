@@ -382,7 +382,7 @@
         this._aes = new AES(key);
     }
 
-    ModeOfOperationECB.prototype.encrypt = function(plaintext) {
+    ModeOfOperationECB.prototype.encrypt = function(plaintext, callback) {
         plaintext = coerceArray(plaintext);
 
         if ((plaintext.length % 16) !== 0) {
@@ -396,12 +396,15 @@
             copyArray(plaintext, block, 0, i, i + 16);
             block = this._aes.encrypt(block);
             copyArray(block, ciphertext, i);
+            if (callback) {
+                callback(i);
+            }
         }
 
         return ciphertext;
     }
 
-    ModeOfOperationECB.prototype.decrypt = function(ciphertext) {
+    ModeOfOperationECB.prototype.decrypt = function(ciphertext, callback) {
         ciphertext = coerceArray(ciphertext);
 
         if ((ciphertext.length % 16) !== 0) {
@@ -415,6 +418,9 @@
             copyArray(ciphertext, block, 0, i, i + 16);
             block = this._aes.decrypt(block);
             copyArray(block, plaintext, i);
+            if (callback) {
+                callback(i);
+            }
         }
 
         return plaintext;
@@ -444,7 +450,7 @@
         this._aes = new AES(key);
     }
 
-    ModeOfOperationCBC.prototype.encrypt = function(plaintext) {
+    ModeOfOperationCBC.prototype.encrypt = function(plaintext, callback) {
         plaintext = coerceArray(plaintext);
 
         if ((plaintext.length % 16) !== 0) {
@@ -463,12 +469,15 @@
 
             this._lastCipherblock = this._aes.encrypt(block);
             copyArray(this._lastCipherblock, ciphertext, i);
+            if (callback) {
+                callback(i);
+            }
         }
 
         return ciphertext;
     }
 
-    ModeOfOperationCBC.prototype.decrypt = function(ciphertext) {
+    ModeOfOperationCBC.prototype.decrypt = function(ciphertext, callback) {
         ciphertext = coerceArray(ciphertext);
 
         if ((ciphertext.length % 16) !== 0) {
@@ -487,6 +496,9 @@
             }
 
             copyArray(ciphertext, this._lastCipherblock, 0, i, i + 16);
+            if (callback) {
+                callback(i);
+            }
         }
 
         return plaintext;
@@ -520,7 +532,7 @@
         this._aes = new AES(key);
     }
 
-    ModeOfOperationCFB.prototype.encrypt = function(plaintext) {
+    ModeOfOperationCFB.prototype.encrypt = function(plaintext, callback) {
         if ((plaintext.length % this.segmentSize) != 0) {
             throw new Error('invalid plaintext size (must be segmentSize bytes)');
         }
@@ -537,12 +549,15 @@
             // Shift the register
             copyArray(this._shiftRegister, this._shiftRegister, 0, this.segmentSize);
             copyArray(encrypted, this._shiftRegister, 16 - this.segmentSize, i, i + this.segmentSize);
+            if (callback) {
+                callback(i);
+            }
         }
 
         return encrypted;
     }
 
-    ModeOfOperationCFB.prototype.decrypt = function(ciphertext) {
+    ModeOfOperationCFB.prototype.decrypt = function(ciphertext, callback) {
         if ((ciphertext.length % this.segmentSize) != 0) {
             throw new Error('invalid ciphertext size (must be segmentSize bytes)');
         }
@@ -560,6 +575,9 @@
             // Shift the register
             copyArray(this._shiftRegister, this._shiftRegister, 0, this.segmentSize);
             copyArray(ciphertext, this._shiftRegister, 16 - this.segmentSize, i, i + this.segmentSize);
+            if (callback) {
+                callback(i);
+            }
         }
 
         return plaintext;
@@ -589,7 +607,7 @@
         this._aes = new AES(key);
     }
 
-    ModeOfOperationOFB.prototype.encrypt = function(plaintext) {
+    ModeOfOperationOFB.prototype.encrypt = function(plaintext, callback) {
         var encrypted = coerceArray(plaintext, true);
 
         for (var i = 0; i < encrypted.length; i++) {
@@ -598,6 +616,9 @@
                 this._lastPrecipherIndex = 0;
             }
             encrypted[i] ^= this._lastPrecipher[this._lastPrecipherIndex++];
+            if (callback) {
+                callback(i);
+            }
         }
 
         return encrypted;
@@ -688,7 +709,7 @@
         this._aes = new AES(key);
     }
 
-    ModeOfOperationCTR.prototype.encrypt = function(plaintext) {
+    ModeOfOperationCTR.prototype.encrypt = function(plaintext, callback) {
         var encrypted = coerceArray(plaintext, true);
 
         for (var i = 0; i < encrypted.length; i++) {
@@ -698,6 +719,9 @@
                 this._counter.increment();
             }
             encrypted[i] ^= this._remainingCounter[this._remainingCounterIndex++];
+            if (callback) {
+                callback(i);
+            }
         }
 
         return encrypted;
