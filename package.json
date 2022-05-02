@@ -8,7 +8,7 @@
   "devDependencies": {
     "eslint": "^8.2.0",
     "eslint-plugin-jest": "^26.0",
-    "jest": "^27",
+    "jest": "^28",
     "rollup": "^2"
   },
   "main": "dist/index.cjs.js",
