@@ -6,10 +6,10 @@
   },
   "description": "A pure JavaScript implementation of the AES block cipher and all common modes of operation.",
   "devDependencies": {
-    "eslint": "^8.2.0",
-    "eslint-plugin-jest": "^26.0",
-    "jest": "^28",
-    "rollup": "^2"
+    "eslint": "^8.23.0",
+    "eslint-plugin-jest": "^27.0.2",
+    "jest": "^29.0.1",
+    "rollup": "^2.78.1"
   },
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -41,6 +41,5 @@
     "Richard Moore <me@ricmoo.com>",
     "Andrey Kutejko <andy128k@gmail.com>"
   ],
-  "license": "MIT",
-  "dependencies": {}
+  "license": "MIT"
 }
