@@ -9,3 +9,4 @@ export declare class CTR extends ModeOfOperation {
     encrypt(plaintext: Uint8Array): Uint8Array;
     decrypt(ciphertext: Uint8Array): Uint8Array;
 }
+//# sourceMappingURL=mode-ctr.d.ts.map

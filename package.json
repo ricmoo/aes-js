@@ -1,24 +1,40 @@
 {
   "name": "aes-js",
-  "version": "4.0.0-beta.2",
+  "version": "4.0.0-beta.3",
   "description": "A pure JavaScript implementation of the AES block cipher and all common modes of operation.",
   "devDependencies": {
     "@types/mocha": "^9.1.0",
     "@types/node": "^16.7.10",
     "mocha": "^9.2.2",
-    "typescript": "^4.6.2"
+    "typescript": "^4.7.4"
+  },
+  "exports": {
+    ".": {
+      "import": "./lib.esm/index.js",
+      "require": "./lib.commonjs/index.js",
+      "types": "./types/index.d.ts"
+    }
   },
   "scripts": {
-    "build": "tsc --build ./tsconfig.json",
     "auto-build": "npm run build -- -w",
-    "test": "mocha ./lib/tests.js"
+    "build": "tsc --build ./tsconfig.esm.json",
+    "build-all": "npm run build && npm run build-commonjs && npm run build-types",
+    "build-clean": "npm run clean && npm run build-all",
+    "build-commonjs": "tsc --build ./tsconfig.commonjs.json && cp ./package-commonjs.json ./lib.commonjs/package.json",
+    "build-types": "tsc --build ./tsconfig.types.json",
+    "clean": "rm -rf dist lib.commonjs lib.esm types",
+    "test-commonjs": "mocha ./lib.commonjs/tests.js",
+    "test-esm": "mocha ./lib.esm/tests.js",
+    "test": "npm run test-commonjs && npm run test-esm"
   },
-  "main": "./lib/index.js",
+  "main": "./lib.commonjs/index.js",
+  "module": "./lib.esm/index.js",
   "publishConfig": {
     "tag": "beta"
   },
+  "sideEffects": false,
   "type": "module",
-  "types": "./lib/index.d.ts",
+  "types": "./types/index.d.ts",
   "keywords": [
     "aes",
     "aes-ctr",

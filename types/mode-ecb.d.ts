@@ -4,3 +4,4 @@ export declare class ECB extends ModeOfOperation {
     encrypt(plaintext: Uint8Array): Uint8Array;
     decrypt(crypttext: Uint8Array): Uint8Array;
 }
+//# sourceMappingURL=mode-ecb.d.ts.map

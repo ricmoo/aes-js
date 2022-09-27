@@ -6,3 +6,4 @@ export declare abstract class ModeOfOperation {
     abstract encrypt(plaintext: Uint8Array): Uint8Array;
     abstract decrypt(ciphertext: Uint8Array): Uint8Array;
 }
+//# sourceMappingURL=mode.d.ts.map

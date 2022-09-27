@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./lib/",
-    "rootDir": "./src.ts",
-    "declaration": true,
+    "declaration": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "lib": [
@@ -11,7 +9,7 @@
       "dom"
     ],
     "module": "es6",
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
@@ -20,6 +18,7 @@
     "preserveSymlinks": true,
     "preserveWatchOutput": true,
     "pretty": false,
+    "rootDir": "./src.ts",
     "sourceMap": true,
     "strict": true,
     "target": "es2016"
