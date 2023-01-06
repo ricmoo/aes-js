@@ -371,6 +371,12 @@ var key_256 = pbkdf2.pbkdf2Sync('password', 'salt', 1, 256 / 8, 'sha512');
 
 Another possibility, is to use a hashing function, such as SHA256 to hash the password, but this method is vulnerable to [Rainbow Attacks](http://en.wikipedia.org/wiki/Rainbow_table), unless you use a [salt](http://en.wikipedia.org/wiki/Salt_(cryptography)).
 
+A simple way to do this in browser is using [js-sha256](https://github.com/emn178/js-sha256) like:
+
+```javascript
+var key_256 = sha256.array('salt' + 'password'.normalize('NFKC'));
+```
+
 Performance
 -----------
 
