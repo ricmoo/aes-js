@@ -374,7 +374,7 @@ Another possibility, is to use a hashing function, such as SHA256 to hash the pa
 A simple way to do this in browser is using [js-sha256](https://github.com/emn178/js-sha256) like:
 
 ```javascript
-var key_256 = sha256.array('salt' + 'password');
+var key_256 = sha256.array('salt' + 'password'.normalize('NFKC'));
 ```
 
 Performance
