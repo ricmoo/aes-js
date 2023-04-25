@@ -1,6 +1,6 @@
 {
   "name": "aes-js",
-  "version": "4.0.0-beta.3",
+  "version": "4.0.0-beta.4",
   "description": "A pure JavaScript implementation of the AES block cipher and all common modes of operation.",
   "devDependencies": {
     "@types/mocha": "^9.1.0",
@@ -12,7 +12,8 @@
     ".": {
       "import": "./lib.esm/index.js",
       "require": "./lib.commonjs/index.js",
-      "types": "./types/index.d.ts"
+      "types": "./types/index.d.ts",
+      "default": "./lib.commonjs/index.js"
     }
   },
   "scripts": {
@@ -33,7 +34,6 @@
     "tag": "beta"
   },
   "sideEffects": false,
-  "type": "module",
   "types": "./types/index.d.ts",
   "keywords": [
     "aes",
