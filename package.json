@@ -1,6 +1,6 @@
 {
   "name": "aes-js",
-  "version": "4.0.0-beta.4",
+  "version": "4.0.0-beta.5",
   "description": "A pure JavaScript implementation of the AES block cipher and all common modes of operation.",
   "devDependencies": {
     "@types/mocha": "^9.1.0",
