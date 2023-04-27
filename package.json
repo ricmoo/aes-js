@@ -11,19 +11,16 @@
   "exports": {
     ".": {
       "import": "./lib.esm/index.js",
-      "require": "./lib.commonjs/index.js",
-      "types": "./types/index.d.ts",
       "default": "./lib.commonjs/index.js"
     }
   },
   "scripts": {
     "auto-build": "npm run build -- -w",
     "build": "tsc --build ./tsconfig.esm.json",
-    "build-all": "npm run build && npm run build-commonjs && npm run build-types",
+    "build-all": "npm run build && npm run build-commonjs",
     "build-clean": "npm run clean && npm run build-all",
     "build-commonjs": "tsc --build ./tsconfig.commonjs.json && cp ./package-commonjs.json ./lib.commonjs/package.json",
-    "build-types": "tsc --build ./tsconfig.types.json",
-    "clean": "rm -rf dist lib.commonjs lib.esm types",
+    "clean": "rm -rf lib.commonjs lib.esm && cp -r misc/basedirs/* .",
     "test-commonjs": "mocha ./lib.commonjs/tests.js",
     "test-esm": "mocha ./lib.esm/tests.js",
     "test": "npm run test-commonjs && npm run test-esm"
@@ -34,7 +31,6 @@
     "tag": "beta"
   },
   "sideEffects": false,
-  "types": "./types/index.d.ts",
   "keywords": [
     "aes",
     "aes-ctr",
